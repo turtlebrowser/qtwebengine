@@ -152,21 +152,20 @@ public:
 
     bool AllowAppCache(const GURL &manifest_url,
                        const GURL &first_party,
-                       const base::Optional<url::Origin>& top_frame_origin,
+                       const base::Optional<url::Origin> &top_frame_origin,
                        content::BrowserContext *context) override;
-    content::AllowServiceWorkerResult
-    AllowServiceWorkerOnIO(const GURL &scope,
-                           const GURL &site_for_cookies,
-                           const base::Optional<url::Origin> &top_frame_origin,
-                           const GURL &script_url,
-                           content::ResourceContext *context) override;
-
-    content::AllowServiceWorkerResult
-    AllowServiceWorkerOnUI(const GURL &scope,
-                           const GURL &site_for_cookies,
-                           const base::Optional<url::Origin> &top_frame_origin,
-                           const GURL &script_url,
-                           content::BrowserContext *context) override;
+    content::AllowServiceWorkerResult AllowServiceWorkerOnIO(
+            const GURL &scope,
+            const GURL &site_for_cookies,
+            const base::Optional<url::Origin> &top_frame_origin,
+            const GURL &script_url,
+            content::ResourceContext *context) override;
+    content::AllowServiceWorkerResult AllowServiceWorkerOnUI(
+            const GURL &scope,
+            const GURL &site_for_cookies,
+            const base::Optional<url::Origin> &top_frame_origin,
+            const GURL &script_url,
+            content::BrowserContext *context) override;
 
     void AllowWorkerFileSystem(const GURL &url,
                                content::BrowserContext *context,
@@ -244,6 +243,12 @@ public:
     scoped_refptr<network::SharedURLLoaderFactory> GetSystemSharedURLLoaderFactory() override;
     network::mojom::NetworkContext *GetSystemNetworkContext() override;
     void OnNetworkServiceCreated(network::mojom::NetworkService *network_service) override;
+    void ConfigureNetworkContextParams(content::BrowserContext *context,
+                                       bool in_memory,
+                                       const base::FilePath &relative_partition_path,
+                                       network::mojom::NetworkContextParams *network_context_params,
+                                       network::mojom::CertVerifierCreationParams *cert_verifier_creation_params) override;
+
     std::vector<base::FilePath> GetNetworkContextsParentDirectory() override;
     void RegisterNonNetworkNavigationURLLoaderFactories(int frame_tree_node_id, NonNetworkURLLoaderFactoryMap *factories) override;
     void RegisterNonNetworkSubresourceURLLoaderFactories(int render_process_id, int render_frame_id,
@@ -257,11 +262,7 @@ public:
     std::string GetProduct() override;
 
 private:
-    void InitFrameInterfaces();
-
     scoped_refptr<ShareGroupQtQuick> m_shareGroupQtQuick;
-    std::unique_ptr<service_manager::BinderRegistry> m_frameInterfaces;
-    std::unique_ptr<service_manager::BinderRegistryWithArgs<content::RenderFrameHost*>> m_frameInterfacesParameterized;
 };
 
 } // namespace QtWebEngineCore

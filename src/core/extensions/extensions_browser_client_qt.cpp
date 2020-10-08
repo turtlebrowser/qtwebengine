@@ -157,7 +157,7 @@ public:
     // mojom::URLLoader implementation:
     void FollowRedirect(const std::vector<std::string> &removed_headers,
                         const net::HttpRequestHeaders &modified_headers,
-                        const net::HttpRequestHeaders& modified_cors_exempt_headers,
+                        const net::HttpRequestHeaders &modified_cors_exempt_headers,
                         const base::Optional<GURL> &new_url) override
     {
         NOTREACHED() << "No redirects for local file loads.";
@@ -213,10 +213,9 @@ private:
         }
         head->headers = response_headers_;
         head->headers->AddHeader(net::HttpRequestHeaders::kContentLength,
-                                 base::NumberToString(head->content_length));
+                                 base::NumberToString(head->content_length).c_str());
         if (!head->mime_type.empty()) {
-            head->headers->AddHeader(net::HttpRequestHeaders::kContentType,
-                                     head->mime_type.c_str());
+            head->headers->AddHeader(net::HttpRequestHeaders::kContentType, head->mime_type.c_str());
         }
         client_->OnReceiveResponse(std::move(head));
         client_->OnStartLoadingResponseBody(std::move(pipe.consumer_handle));

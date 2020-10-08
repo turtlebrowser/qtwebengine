@@ -70,7 +70,7 @@ BrowserAccessibility *BrowserAccessibility::Create()
 BrowserAccessibilityManagerQt::BrowserAccessibilityManagerQt(
     QObject *parentObject, const ui::AXTreeUpdate &initialTree,
     BrowserAccessibilityDelegate* delegate)
-      : BrowserAccessibilityManager(initialTree, delegate)
+      : BrowserAccessibilityManager(delegate)
       , m_parentObject(parentObject)
 {
     Initialize(initialTree);

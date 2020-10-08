@@ -1231,9 +1231,10 @@ void RenderWidgetHostViewQt::closePopup()
     host()->LostFocus();
 }
 
-void RenderWidgetHostViewQt::ProcessAckedTouchEvent(const content::TouchEventWithLatencyInfo &touch, blink::mojom::InputEventResultState ack_result) {
+void RenderWidgetHostViewQt::ProcessAckedTouchEvent(const content::TouchEventWithLatencyInfo &touch, blink::mojom::InputEventResultState ack_result)
+{
     Q_UNUSED(touch);
-    const bool eventConsumed = ack_result == content::INPUT_EVENT_ACK_STATE_CONSUMED;
+    const bool eventConsumed = ack_result == blink::mojom::InputEventResultState::kConsumed;
     const bool isSetNonBlocking = content::InputEventAckStateIsSetNonBlocking(ack_result);
     m_gestureProvider.OnTouchEventAck(touch.event.unique_touch_event_id, eventConsumed, isSetNonBlocking);
 }
@@ -1550,7 +1551,7 @@ void RenderWidgetHostViewQt::GestureEventAck(const blink::WebGestureEvent &event
     if (event.GetType() != blink::WebInputEvent::Type::kGestureScrollUpdate)
         return;
     switch (ack_result) {
-    case blink::mojom::InputEventResultState::kConsumed:
+    case blink::mojom::InputEventResultState::kNotConsumed:
     case blink::mojom::InputEventResultState::kNoConsumerExists:
         WebEventFactory::sendUnhandledWheelEvent(event, delegate());
         break;

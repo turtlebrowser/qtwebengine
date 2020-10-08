@@ -59,26 +59,18 @@ public:
     explicit AccessibilityTreeFormatterQt();
     ~AccessibilityTreeFormatterQt() override;
 
+   std::unique_ptr<base::DictionaryValue> BuildAccessibilityTreeForProcess(base::ProcessId) override { return nullptr; }
+   std::unique_ptr<base::DictionaryValue> BuildAccessibilityTreeForWindow(gfx::AcceleratedWidget) override { return nullptr; }
+   std::unique_ptr<base::DictionaryValue> BuildAccessibilityTreeForPattern(const base::StringPiece &) override { return nullptr; }
+   std::unique_ptr<base::DictionaryValue> BuildAccessibilityTree(content::BrowserAccessibility *) override;
 private:
-
-  std::unique_ptr<base::DictionaryValue> BuildAccessibilityTree(
-      BrowserAccessibility* root) override;
-
-  std::unique_ptr<base::DictionaryValue> BuildAccessibilityTreeForProcess(
-      base::ProcessId pid) override;
-
-  std::unique_ptr<base::DictionaryValue> BuildAccessibilityTreeForWindow(
-      gfx::AcceleratedWidget widget) override;
-
-  std::unique_ptr<base::DictionaryValue> BuildAccessibilityTreeForPattern(
-      const base::StringPiece& pattern) override;
-
     base::FilePath::StringType GetExpectedFileSuffix() override;
     const std::string GetAllowEmptyString() override;
     const std::string GetAllowString() override;
     const std::string GetDenyString() override;
     const std::string GetDenyNodeString() override;
-    void AddProperties(const BrowserAccessibility &node, base::DictionaryValue* dict);
+    void RecursiveBuildAccessibilityTree(const content::BrowserAccessibility &node, base::DictionaryValue *dict) const;
+    void AddProperties(const BrowserAccessibility &node, base::DictionaryValue *dict) const;
     base::string16 ProcessTreeForOutput(const base::DictionaryValue &node, base::DictionaryValue * = nullptr) override;
 };
 
@@ -90,31 +82,30 @@ AccessibilityTreeFormatterQt::~AccessibilityTreeFormatterQt()
 {
 }
 
-std::unique_ptr<base::DictionaryValue> AccessibilityTreeFormatterQt::BuildAccessibilityTree(BrowserAccessibility* root)
+std::unique_ptr<base::DictionaryValue> AccessibilityTreeFormatterQt::BuildAccessibilityTree(content::BrowserAccessibility *root)
 {
-    QT_NOT_YET_IMPLEMENTED;
-    return {};
+    std::unique_ptr<base::DictionaryValue> dict(new base::DictionaryValue);
+    RecursiveBuildAccessibilityTree(*root, dict.get());
+    return dict;
 }
 
-std::unique_ptr<base::DictionaryValue> AccessibilityTreeFormatterQt::BuildAccessibilityTreeForProcess(base::ProcessId pid)
+void AccessibilityTreeFormatterQt::RecursiveBuildAccessibilityTree(const BrowserAccessibility &node, base::DictionaryValue *dict) const
 {
-    QT_NOT_YET_IMPLEMENTED;
-    return {};
+    AddProperties(node, dict);
+
+    auto children = std::make_unique<base::ListValue>();
+    for (size_t i = 0; i < node.PlatformChildCount(); ++i) {
+        std::unique_ptr<base::DictionaryValue> child_dict(new base::DictionaryValue);
+
+        content::BrowserAccessibility *child_node = node.PlatformGetChild(i);
+
+        RecursiveBuildAccessibilityTree(*child_node, child_dict.get());
+        children->Append(std::move(child_dict));
+    }
+    dict->Set(kChildrenDictAttr, std::move(children));
 }
 
-std::unique_ptr<base::DictionaryValue> AccessibilityTreeFormatterQt::BuildAccessibilityTreeForWindow(gfx::AcceleratedWidget widget)
-{
-    QT_NOT_YET_IMPLEMENTED;
-    return {};
-}
-
-std::unique_ptr<base::DictionaryValue> AccessibilityTreeFormatterQt::BuildAccessibilityTreeForPattern(const base::StringPiece& pattern)
-{
-    QT_NOT_YET_IMPLEMENTED;
-    return {};
-}
-
-void AccessibilityTreeFormatterQt::AddProperties(const BrowserAccessibility &node, base::DictionaryValue *dict)
+void AccessibilityTreeFormatterQt::AddProperties(const BrowserAccessibility &node, base::DictionaryValue *dict) const
 {
     dict->SetInteger("id", node.GetId());
     const BrowserAccessibilityQt *acc_node = ToBrowserAccessibilityQt(&node);

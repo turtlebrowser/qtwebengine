@@ -201,7 +201,7 @@ void ClipboardQt::Clear(ui::ClipboardBuffer type)
                                                                               : QClipboard::Selection);
 }
 
-void ClipboardQt::ReadAvailableTypes(ui::ClipboardBuffer type, std::vector<base::string16>* types) const
+void ClipboardQt::ReadAvailableTypes(ui::ClipboardBuffer type, std::vector<base::string16> *types) const
 {
     if (!types) {
         NOTREACHED();

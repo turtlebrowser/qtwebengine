@@ -95,6 +95,7 @@ public:
     ExtensionSystemProvider *GetExtensionSystemFactory() override;
     void RegisterBrowserInterfaceBindersForFrame(mojo::BinderMapWithContext<content::RenderFrameHost*> *,
                                                  content::RenderFrameHost *, const extensions::Extension *) const override;
+
     std::unique_ptr<RuntimeAPIDelegate> CreateRuntimeAPIDelegate(content::BrowserContext *context) const override;
     const ComponentExtensionResourceManager *
     GetComponentExtensionResourceManager() override;
