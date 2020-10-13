@@ -60,6 +60,7 @@
 #include "content/browser/compositor/image_transport_factory.h"
 #include "content/browser/compositor/surface_utils.h"
 #include "content/browser/frame_host/frame_tree.h"
+#include "content/browser/frame_host/frame_tree_node.h"
 #include "content/browser/frame_host/render_frame_host_impl.h"
 #include "content/browser/renderer_host/input/synthetic_gesture_target.h"
 #include "content/browser/renderer_host/render_view_host_delegate.h"
@@ -773,7 +774,7 @@ void RenderWidgetHostViewQt::OnUpdateTextInputStateCalled(content::TextInputMana
     Q_UNUSED(updated_view);
     Q_UNUSED(did_update_state);
 
-    const content::TextInputState *state = text_input_manager_->GetTextInputState();
+    const ui::mojom::TextInputState *state = text_input_manager_->GetTextInputState();
     if (!state) {
         m_delegate->inputMethodStateChanged(false /*editorVisible*/, false /*passwordInput*/);
         m_delegate->setInputMethodHints(Qt::ImhNone);
@@ -788,14 +789,14 @@ void RenderWidgetHostViewQt::OnUpdateTextInputStateCalled(content::TextInputMana
 #endif
     m_surroundingText = toQt(state->value);
     // Remove IME composition text from the surrounding text
-    if (state->composition_start != -1 && state->composition_end != -1)
-        m_surroundingText.remove(state->composition_start, state->composition_end - state->composition_start);
+    if (state->composition.has_value())
+        m_surroundingText.remove(state->composition->start(), state->composition->end() - state->composition->start());
 
     // In case of text selection, the update is expected in RenderWidgetHostViewQt::selectionChanged().
     if (GetSelectedText().empty()) {
         // At this point it is unknown whether the text input state has been updated due to a text selection.
         // Keep the cursor position updated for cursor movements too.
-        m_cursorPosition = state->selection_start;
+        m_cursorPosition = state->selection.start();
         m_delegate->inputMethodStateChanged(type != ui::TEXT_INPUT_TYPE_NONE, type == ui::TEXT_INPUT_TYPE_PASSWORD);
     }
 
@@ -805,7 +806,7 @@ void RenderWidgetHostViewQt::OnUpdateTextInputStateCalled(content::TextInputMana
     }
 
     // Ignore selection change triggered by ime composition unless it clears an actual text selection
-    if (state->composition_start != -1 && m_emptyPreviousSelection) {
+    if (state->composition.has_value() && m_emptyPreviousSelection) {
         m_imState = 0;
         return;
     }
@@ -837,11 +838,13 @@ void RenderWidgetHostViewQt::OnTextSelectionChanged(content::TextInputManager *t
         return;
 
 #if defined(USE_OZONE)
+#if defined(HAS_TEXT_SELECTION_PATCH)
     if (!selection->selected_text().empty() && selection->user_initiated()) {
         // Set the CLIPBOARD_TYPE_SELECTION to the ui::Clipboard.
         ui::ScopedClipboardWriter clipboard_writer(ui::ClipboardBuffer::kSelection);
         clipboard_writer.WriteText(selection->selected_text());
     }
+#endif
 #endif // defined(USE_OZONE)
 
     m_imState |= ImStateFlags::TextSelectionUpdated;
@@ -877,7 +880,7 @@ void RenderWidgetHostViewQt::selectionChanged()
         // RenderWidgetHostViewQt::OnUpdateTextInputStateCalled() does not update the cursor position
         // if the selection is cleared because TextInputState changes before the TextSelection change.
         Q_ASSERT(text_input_manager_->GetTextInputState());
-        m_cursorPosition = text_input_manager_->GetTextInputState()->selection_start;
+        m_cursorPosition = text_input_manager_->GetTextInputState()->selection.start();
         m_delegate->inputMethodStateChanged(true /*editorVisible*/, type == ui::TEXT_INPUT_TYPE_PASSWORD);
 
         m_anchorPositionWithinSelection = m_cursorPosition;
@@ -1235,7 +1238,7 @@ void RenderWidgetHostViewQt::ProcessAckedTouchEvent(const content::TouchEventWit
 {
     Q_UNUSED(touch);
     const bool eventConsumed = ack_result == blink::mojom::InputEventResultState::kConsumed;
-    const bool isSetNonBlocking = content::InputEventAckStateIsSetNonBlocking(ack_result);
+    const bool isSetNonBlocking = content::InputEventResultStateIsSetNonBlocking(ack_result);
     m_gestureProvider.OnTouchEventAck(touch.event.unique_touch_event_id, eventConsumed, isSetNonBlocking);
 }
 
@@ -1434,9 +1437,8 @@ void RenderWidgetHostViewQt::handleInputMethodEvent(QInputMethodEvent *ev)
     }
 
     if (hasSelection) {
-        content::mojom::FrameInputHandler *frameInputHandler = getFrameInputHandler();
-        if (frameInputHandler)
-            frameInputHandler->SetEditableSelectionOffsets(selectionRange.start(), selectionRange.end());
+        if (auto *frameWidgetInputHandler = getFrameWidgetInputHandler())
+            frameWidgetInputHandler->SetEditableSelectionOffsets(selectionRange.start(), selectionRange.end());
     }
 
     int replacementLength = ev->replacementLength();
@@ -1829,26 +1831,13 @@ void RenderWidgetHostViewQt::handleFocusEvent(QFocusEvent *ev)
     }
 }
 
-content::RenderFrameHost *RenderWidgetHostViewQt::getFocusedFrameHost()
+blink::mojom::FrameWidgetInputHandler *RenderWidgetHostViewQt::getFrameWidgetInputHandler()
 {
-    content::RenderViewHostImpl *viewHost = content::RenderViewHostImpl::From(host());
-    if (!viewHost)
+    auto *focused_widget = GetFocusedWidget();
+    if (!focused_widget)
         return nullptr;
 
-    content::FrameTreeNode *focusedFrame = viewHost->GetDelegate()->GetFrameTree()->GetFocusedFrame();
-    if (!focusedFrame)
-        return nullptr;
-
-    return focusedFrame->current_frame_host();
-}
-
-content::mojom::FrameInputHandler *RenderWidgetHostViewQt::getFrameInputHandler()
-{
-    content::RenderFrameHostImpl *frameHost = static_cast<content::RenderFrameHostImpl *>(getFocusedFrameHost());
-    if (!frameHost)
-        return nullptr;
-
-    return frameHost->GetFrameInputHandler();
+    return focused_widget->GetFrameWidgetInputHandler();
 }
 
 ui::TextInputType RenderWidgetHostViewQt::getTextInputType() const

@@ -127,7 +127,7 @@ content::WebContents *WebContentsDelegateQt::OpenURLFromTab(content::WebContents
     content::SiteInstance *target_site_instance = params.source_site_instance.get();
     content::Referrer referrer = params.referrer;
     if (params.disposition != WindowOpenDisposition::CURRENT_TAB) {
-        QSharedPointer<WebContentsAdapter> targetAdapter = createWindow(0, params.disposition, gfx::Rect(), params.user_gesture);
+        QSharedPointer<WebContentsAdapter> targetAdapter = createWindow(0, params.disposition, gfx::Rect(), toQt(params.url), params.user_gesture);
         if (targetAdapter) {
             if (targetAdapter->profile() != source->GetBrowserContext()) {
                 target_site_instance = nullptr;
@@ -541,8 +541,7 @@ void WebContentsDelegateQt::DidFinishLoad(content::RenderFrameHost* render_frame
     EmitLoadFinished(http_statuscode < 400, toQt(validated_url), false /* isErrorPage */, http_statuscode);
 }
 
-void WebContentsDelegateQt::DidUpdateFaviconURL(const std::vector<blink::mojom::FaviconURLPtr> &candidates)
-
+void WebContentsDelegateQt::DidUpdateFaviconURL(content::RenderFrameHost *render_frame_host, const std::vector<blink::mojom::FaviconURLPtr> &candidates)
 {
     QList<FaviconInfo> faviconCandidates;
     faviconCandidates.reserve(static_cast<int>(candidates.size()));
@@ -579,11 +578,11 @@ content::JavaScriptDialogManager *WebContentsDelegateQt::GetJavaScriptDialogMana
     return JavaScriptDialogManagerQt::GetInstance();
 }
 
-void WebContentsDelegateQt::EnterFullscreenModeForTab(content::WebContents *web_contents, const GURL& origin, const blink::mojom::FullscreenOptions &)
+void WebContentsDelegateQt::EnterFullscreenModeForTab(content::RenderFrameHost *requesting_frame, const blink::mojom::FullscreenOptions &options)
 {
-    Q_UNUSED(web_contents);
+    Q_UNUSED(options);
     if (!m_viewClient->isFullScreenMode())
-        m_viewClient->requestFullScreenMode(toQt(origin), true);
+        m_viewClient->requestFullScreenMode(toQt(requesting_frame->GetLastCommittedURL()), true);
 }
 
 void WebContentsDelegateQt::ExitFullscreenModeForTab(content::WebContents *web_contents)
@@ -698,7 +697,7 @@ void WebContentsDelegateQt::overrideWebPreferences(content::WebContents *webCont
 
 QSharedPointer<WebContentsAdapter>
 WebContentsDelegateQt::createWindow(std::unique_ptr<content::WebContents> new_contents,
-                                    WindowOpenDisposition disposition, const gfx::Rect &initial_pos,
+                                    WindowOpenDisposition disposition, const gfx::Rect &initial_pos, const QUrl &url,
                                     bool user_gesture)
 {
     QSharedPointer<WebContentsAdapter> newAdapter = QSharedPointer<WebContentsAdapter>::create(std::move(new_contents));
@@ -706,7 +705,7 @@ WebContentsDelegateQt::createWindow(std::unique_ptr<content::WebContents> new_co
     return m_viewClient->adoptNewWindow(
             std::move(newAdapter),
             static_cast<WebContentsAdapterClient::WindowOpenDisposition>(disposition), user_gesture,
-            toQt(initial_pos), m_initialTargetUrl);
+            toQt(initial_pos), url);
 }
 
 void WebContentsDelegateQt::allowCertificateError(const QSharedPointer<CertificateErrorController> &errorController)

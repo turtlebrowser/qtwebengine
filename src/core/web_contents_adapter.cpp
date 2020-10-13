@@ -382,7 +382,7 @@ void Navigate(WebContentsAdapter *adapter, const content::NavigationController::
     adapter->resetSelection();
 }
 
-void NavigateTask(QWeakPointer<WebContentsAdapter> weakAdapter, const content::NavigationController::LoadURLParams &params)
+void NavigateTask(QWeakPointer<WebContentsAdapter> weakAdapter, std::unique_ptr<content::NavigationController::LoadURLParams> params)
 {
     DCHECK_CURRENTLY_ON(content::BrowserThread::UI);
     const auto adapter = weakAdapter.toStrongRef();
@@ -529,8 +529,10 @@ void WebContentsAdapter::initialize(content::SiteInstance *site)
     extensions::ExtensionWebContentsObserverQt::CreateForWebContents(webContents());
 #endif
     FormInteractionTabHelper::CreateForWebContents(webContents());
-    if (auto *performance_manager_registry = performance_manager::PerformanceManagerRegistry::GetInstance())
-        performance_manager_registry->CreatePageNodeForWebContents(webContents());
+    if (auto *performance_manager_registry = performance_manager::PerformanceManagerRegistry::GetInstance()) {
+        if (!webContents()->GetMainFrame()->IsRenderFrameCreated())
+            performance_manager_registry->CreatePageNodeForWebContents(webContents());
+    }
 
     // Create an instance of WebEngineVisitedLinksManager to catch the first
     // content::NOTIFICATION_RENDERER_PROCESS_CREATED event. This event will
@@ -543,9 +545,7 @@ void WebContentsAdapter::initialize(content::SiteInstance *site)
     Q_ASSERT(rvh);
     if (!rvh->IsRenderViewLive())
         static_cast<content::WebContentsImpl*>(m_webContents.get())->CreateRenderViewForRenderManager(
-                rvh, MSG_ROUTING_NONE, MSG_ROUTING_NONE,
-                base::UnguessableToken::Create(), base::UnguessableToken::Create(),
-                content::FrameReplicationState());
+                rvh, base::nullopt, MSG_ROUTING_NONE);
 
     m_webContentsDelegate->RenderViewHostChanged(nullptr, rvh);
 
@@ -1468,10 +1468,10 @@ void WebContentsAdapter::setWebChannel(QWebChannel *channel, uint worldId)
 static QMimeData *mimeDataFromDropData(const content::DropData &dropData)
 {
     QMimeData *mimeData = new QMimeData();
-    if (!dropData.text.is_null())
-        mimeData->setText(toQt(dropData.text.string()));
-    if (!dropData.html.is_null())
-        mimeData->setHtml(toQt(dropData.html.string()));
+    if (dropData.text.has_value())
+        mimeData->setText(toQt(*dropData.text));
+    if (dropData.html.has_value())
+        mimeData->setHtml(toQt(*dropData.html));
     if (dropData.url.is_valid())
         mimeData->setUrls(QList<QUrl>() << toQt(dropData.url));
     if (!dropData.custom_data.empty()) {
@@ -1591,9 +1591,9 @@ static void fillDropDataFromMimeData(content::DropData *dropData, const QMimeDat
     if (!dropData->filenames.empty())
         return;
     if (mimeData->hasHtml())
-        dropData->html = toNullableString16(mimeData->html());
+        dropData->html = toOptionalString16(mimeData->html());
     if (mimeData->hasText())
-        dropData->text = toNullableString16(mimeData->text());
+        dropData->text = toOptionalString16(mimeData->text());
     if (mimeData->hasFormat(QLatin1String(ui::kMimeTypeWebCustomData))) {
         QByteArray customData = mimeData->data(QLatin1String(ui::kMimeTypeWebCustomData));
         ui::ReadCustomDataIntoMap(customData.constData(), customData.length(), &dropData->custom_data);
@@ -1751,7 +1751,11 @@ void WebContentsAdapter::resetSelection()
     if (auto rwhv = static_cast<RenderWidgetHostViewQt *>(m_webContents->GetRenderWidgetHostView())) {
         if (auto mgr = rwhv->GetTextInputManager())
             if (auto selection = const_cast<content::TextInputManager::TextSelection *>(mgr->GetTextSelection(rwhv)))
+#if defined(HAS_TEXT_SELECTION_PATCH)
                 selection->SetSelection(base::string16(), 0, gfx::Range(), false);
+#else
+                selection->SetSelection(base::string16(), 0, gfx::Range());
+#endif
     }
 }
 
@@ -2029,10 +2033,7 @@ void WebContentsAdapter::undiscard()
     Q_ASSERT(rvh);
     if (!rvh->IsRenderViewLive())
         static_cast<content::WebContentsImpl *>(m_webContents.get())
-                ->CreateRenderViewForRenderManager(rvh, MSG_ROUTING_NONE, MSG_ROUTING_NONE,
-                                                   base::UnguessableToken::Create(),
-                                                   base::UnguessableToken::Create(),
-                                                   content::FrameReplicationState());
+                ->CreateRenderViewForRenderManager(rvh, base::nullopt, MSG_ROUTING_NONE);
     m_webContentsDelegate->RenderViewHostChanged(nullptr, rvh);
     m_adapterClient->initializationFinished();
     m_adapterClient->selectionChanged();
