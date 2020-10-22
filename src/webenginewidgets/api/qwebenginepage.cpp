@@ -2213,7 +2213,7 @@ QWebEnginePage *QWebEnginePage::createWindow(WebWindowType type)
         if (newView)
             return newView->page();
     }
-    return 0;
+    return nullptr;
 }
 
 /*!
