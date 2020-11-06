@@ -59,10 +59,11 @@ public:
     explicit AccessibilityTreeFormatterQt();
     ~AccessibilityTreeFormatterQt() override;
 
-   std::unique_ptr<base::DictionaryValue> BuildAccessibilityTreeForProcess(base::ProcessId) override { return nullptr; }
+   std::unique_ptr<base::DictionaryValue> BuildAccessibilityTreeForSelector(const content::AccessibilityTreeFormatter::TreeSelector &)
+   { return nullptr; }
    std::unique_ptr<base::DictionaryValue> BuildAccessibilityTreeForWindow(gfx::AcceleratedWidget) override { return nullptr; }
-   std::unique_ptr<base::DictionaryValue> BuildAccessibilityTreeForPattern(const base::StringPiece &) override { return nullptr; }
    std::unique_ptr<base::DictionaryValue> BuildAccessibilityTree(content::BrowserAccessibility *) override;
+
 private:
     base::FilePath::StringType GetExpectedFileSuffix() override;
     const std::string GetAllowEmptyString() override;
@@ -72,7 +73,7 @@ private:
     const std::string GetRunUntilEventString() override;
     void RecursiveBuildAccessibilityTree(const content::BrowserAccessibility &node, base::DictionaryValue *dict) const;
     void AddProperties(const BrowserAccessibility &node, base::DictionaryValue *dict) const;
-    base::string16 ProcessTreeForOutput(const base::DictionaryValue &node, base::DictionaryValue * = nullptr) override;
+    std::string ProcessTreeForOutput(const base::DictionaryValue &node, base::DictionaryValue * = nullptr) override;
 };
 
 AccessibilityTreeFormatterQt::AccessibilityTreeFormatterQt()
@@ -172,13 +173,13 @@ void AccessibilityTreeFormatterQt::AddProperties(const BrowserAccessibility &nod
     dict->SetString("description", acc_node->text(QAccessible::Description).toStdString());
 }
 
-base::string16 AccessibilityTreeFormatterQt::ProcessTreeForOutput(const base::DictionaryValue &node, base::DictionaryValue *)
+std::string AccessibilityTreeFormatterQt::ProcessTreeForOutput(const base::DictionaryValue &node, base::DictionaryValue *)
 {
-    base::string16 error_value;
+    std::string error_value;
     if (node.GetString("error", &error_value))
         return error_value;
 
-    base::string16 line;
+    std::string line;
     std::string role_value;
     node.GetString("role", &role_value);
     if (!role_value.empty())
@@ -206,7 +207,7 @@ base::string16 AccessibilityTreeFormatterQt::ProcessTreeForOutput(const base::Di
     node.GetInteger("id", &id_value);
     WriteAttribute(false, base::StringPrintf("id=%d", id_value), &line);
 
-    return line + base::ASCIIToUTF16("\n");
+    return line + "\n";
 }
 
 base::FilePath::StringType AccessibilityTreeFormatterQt::GetExpectedFileSuffix()

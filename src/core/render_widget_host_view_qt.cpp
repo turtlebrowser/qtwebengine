@@ -59,15 +59,15 @@
 #include "components/viz/host/host_frame_sink_manager.h"
 #include "content/browser/compositor/image_transport_factory.h"
 #include "content/browser/compositor/surface_utils.h"
-#include "content/browser/frame_host/frame_tree.h"
-#include "content/browser/frame_host/frame_tree_node.h"
-#include "content/browser/frame_host/render_frame_host_impl.h"
+#include "content/browser/renderer_host/frame_tree.h"
+#include "content/browser/renderer_host/frame_tree_node.h"
 #include "content/browser/renderer_host/input/synthetic_gesture_target.h"
+#include "content/browser/renderer_host/render_frame_host_impl.h"
 #include "content/browser/renderer_host/render_view_host_delegate.h"
 #include "content/browser/renderer_host/render_view_host_impl.h"
-#include "content/common/content_switches_internal.h"
 #include "content/browser/renderer_host/render_widget_host_input_event_router.h"
 #include "content/browser/renderer_host/ui_events_helper.h"
+#include "content/common/content_switches_internal.h"
 #include "content/common/cursors/webcursor.h"
 #include "content/common/input_messages.h"
 #include "third_party/skia/include/core/SkColor.h"
@@ -362,6 +362,7 @@ RenderWidgetHostViewQt::RenderWidgetHostViewQt(content::RenderWidgetHost *widget
     config.enable_longpress_drag_selection = false;
     m_touchSelectionController.reset(new ui::TouchSelectionController(m_touchSelectionControllerClient.get(), config));
 
+    host()->render_frame_metadata_provider()->AddObserver(this);
     host()->render_frame_metadata_provider()->ReportAllFrameSubmissionsForTesting(true);
 
     host()->SetView(this);
@@ -974,7 +975,7 @@ viz::ScopedSurfaceIdAllocator RenderWidgetHostViewQt::DidUpdateVisualProperties(
 
 void RenderWidgetHostViewQt::OnDidUpdateVisualPropertiesComplete(const cc::RenderFrameMetadata &metadata)
 {
-    synchronizeVisualProperties(metadata.local_surface_id_allocation);
+    synchronizeVisualProperties(metadata.local_surface_id);
 }
 
 void RenderWidgetHostViewQt::OnDidFirstVisuallyNonEmptyPaint()
@@ -1014,18 +1015,18 @@ QSGNode *RenderWidgetHostViewQt::updatePaintNode(QSGNode *oldNode)
 void RenderWidgetHostViewQt::notifyShown()
 {
     // Handle possible frame eviction:
-    if (!m_dfhLocalSurfaceIdAllocator.HasValidLocalSurfaceIdAllocation())
+    if (!m_dfhLocalSurfaceIdAllocator.HasValidLocalSurfaceId())
         m_dfhLocalSurfaceIdAllocator.GenerateId();
     if (m_visible)
         return;
     m_visible = true;
 
-    host()->WasShown(base::nullopt);
+    host()->WasShown(nullptr);
 
     m_delegatedFrameHost->AttachToCompositor(m_uiCompositor.get());
-    m_delegatedFrameHost->WasShown(GetLocalSurfaceIdAllocation().local_surface_id(),
+    m_delegatedFrameHost->WasShown(GetLocalSurfaceId(),
                                    m_viewRectInDips.size(),
-                                   base::nullopt);
+                                   nullptr);
 }
 
 void RenderWidgetHostViewQt::notifyHidden()
@@ -1858,9 +1859,9 @@ const viz::FrameSinkId &RenderWidgetHostViewQt::GetFrameSinkId() const
     return m_delegatedFrameHost->frame_sink_id();
 }
 
-const viz::LocalSurfaceIdAllocation &RenderWidgetHostViewQt::GetLocalSurfaceIdAllocation() const
+const viz::LocalSurfaceId &RenderWidgetHostViewQt::GetLocalSurfaceId() const
 {
-    return m_dfhLocalSurfaceIdAllocator.GetCurrentLocalSurfaceIdAllocation();
+    return m_dfhLocalSurfaceIdAllocator.GetCurrentLocalSurfaceId();
 }
 
 void RenderWidgetHostViewQt::TakeFallbackContentFrom(content::RenderWidgetHostView *view)
@@ -1890,8 +1891,6 @@ void RenderWidgetHostViewQt::ResetFallbackToFirstNavigationSurface()
 
 void RenderWidgetHostViewQt::OnRenderFrameMetadataChangedAfterActivation()
 {
-    content::RenderWidgetHostViewBase::OnRenderFrameMetadataChangedAfterActivation();
-
     const cc::RenderFrameMetadata &metadata = host()->render_frame_metadata_provider()->LastRenderFrameMetadata();
     if (metadata.selection.start != m_selectionStart || metadata.selection.end != m_selectionEnd) {
         m_selectionStart = metadata.selection.start;
@@ -1909,7 +1908,7 @@ void RenderWidgetHostViewQt::OnRenderFrameMetadataChangedAfterActivation()
         m_adapterClient->updateContentsSize(toQt(m_lastContentsSize));
 }
 
-void RenderWidgetHostViewQt::synchronizeVisualProperties(const base::Optional<viz::LocalSurfaceIdAllocation> &childSurfaceId)
+void RenderWidgetHostViewQt::synchronizeVisualProperties(const base::Optional<viz::LocalSurfaceId> &childSurfaceId)
 {
     if (childSurfaceId)
         m_dfhLocalSurfaceIdAllocator.UpdateFromChild(*childSurfaceId);
@@ -1923,9 +1922,9 @@ void RenderWidgetHostViewQt::synchronizeVisualProperties(const base::Optional<vi
     m_uiCompositor->SetScaleAndSize(
             m_screenInfo.device_scale_factor,
             viewSizeInPixels,
-            m_uiCompositorLocalSurfaceIdAllocator.GetCurrentLocalSurfaceIdAllocation());
+            m_uiCompositorLocalSurfaceIdAllocator.GetCurrentLocalSurfaceId());
     m_delegatedFrameHost->EmbedSurface(
-            m_dfhLocalSurfaceIdAllocator.GetCurrentLocalSurfaceIdAllocation().local_surface_id(),
+            m_dfhLocalSurfaceIdAllocator.GetCurrentLocalSurfaceId(),
             viewSizeInDips,
             cc::DeadlinePolicy::UseDefaultDeadline());
 
