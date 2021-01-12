@@ -112,13 +112,10 @@ public:
     void GetAdditionalWebUISchemes(std::vector<std::string>* additional_schemes) override;
     void GetAdditionalAllowedSchemesForFileSystem(std::vector<std::string>* additional_schemes) override;
 
-    void BindInterfaceRequestFromFrame(content::RenderFrameHost* render_frame_host,
-                                       const std::string& interface_name,
-                                       mojo::ScopedMessagePipeHandle interface_pipe) override;
     void BindHostReceiverForRenderer(content::RenderProcessHost *render_process_host,
                                      mojo::GenericPendingReceiver receiver) override;
     void RegisterBrowserInterfaceBindersForFrame(content::RenderFrameHost *render_frame_host,
-                                                 service_manager::BinderMapWithContext<content::RenderFrameHost *> *map) override;
+                                                 mojo::BinderMapWithContext<content::RenderFrameHost *> *map) override;
     void RunServiceInstance(const service_manager::Identity &identity,
                             mojo::PendingReceiver<service_manager::mojom::Service> *receiver) override;
     void ExposeInterfacesToRenderer(service_manager::BinderRegistry *registry,
@@ -155,21 +152,21 @@ public:
 
     bool AllowAppCache(const GURL &manifest_url,
                        const GURL &first_party,
+                       const base::Optional<url::Origin>& top_frame_origin,
                        content::BrowserContext *context) override;
+    content::AllowServiceWorkerResult
+    AllowServiceWorkerOnIO(const GURL &scope,
+                           const GURL &site_for_cookies,
+                           const base::Optional<url::Origin> &top_frame_origin,
+                           const GURL &script_url,
+                           content::ResourceContext *context) override;
 
-    bool AllowServiceWorkerOnIO(const GURL &scope,
-                                const GURL &site_for_cookies,
-                                const base::Optional<url::Origin> &top_frame_origin,
-                                const GURL &script_url,
-                                content::ResourceContext *context,
-                                base::RepeatingCallback<content::WebContents*()> wc_getter) override;
-
-    bool AllowServiceWorkerOnUI(const GURL &scope,
-                                const GURL &site_for_cookies,
-                                const base::Optional<url::Origin> &top_frame_origin,
-                                const GURL &script_url,
-                                content::BrowserContext *context,
-                                base::RepeatingCallback<content::WebContents*()> wc_getter) override;
+    content::AllowServiceWorkerResult
+    AllowServiceWorkerOnUI(const GURL &scope,
+                           const GURL &site_for_cookies,
+                           const base::Optional<url::Origin> &top_frame_origin,
+                           const GURL &script_url,
+                           content::BrowserContext *context) override;
 
     void AllowWorkerFileSystem(const GURL &url,
                                content::BrowserContext *context,
@@ -247,9 +244,6 @@ public:
     scoped_refptr<network::SharedURLLoaderFactory> GetSystemSharedURLLoaderFactory() override;
     network::mojom::NetworkContext *GetSystemNetworkContext() override;
     void OnNetworkServiceCreated(network::mojom::NetworkService *network_service) override;
-    mojo::Remote<network::mojom::NetworkContext> CreateNetworkContext(content::BrowserContext *context,
-                                                                      bool in_memory,
-                                                                      const base::FilePath &relative_partition_path) override;
     std::vector<base::FilePath> GetNetworkContextsParentDirectory() override;
     void RegisterNonNetworkNavigationURLLoaderFactories(int frame_tree_node_id, NonNetworkURLLoaderFactoryMap *factories) override;
     void RegisterNonNetworkSubresourceURLLoaderFactories(int render_process_id, int render_frame_id,

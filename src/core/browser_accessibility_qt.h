@@ -79,11 +79,6 @@ public:
     QAccessible::Role role() const override;
     QAccessible::State state() const override;
 
-    // BrowserAccessible
-    void NativeAddReference() override;
-    void NativeReleaseReference() override;
-    bool IsNative() const override { return true; }
-
     // QAccessibleActionInterface
     QStringList actionNames() const override;
     void doAction(const QString &actionName) override;

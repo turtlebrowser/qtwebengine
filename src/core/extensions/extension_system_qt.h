@@ -113,6 +113,8 @@ public:
                        bool install_immediately,
                        InstallUpdateCallback install_update_callback) override;
 #endif // TOOLKIT_QT
+    void PerformActionBasedOnOmahaAttributes(const std::string& extension_id,
+                                             const base::Value& attributes) override;
     //friend class ExtensionSystemSharedFactory;
 
     bool FinishDelayedInstallationIfReady(const std::string &extension_id, bool install_immediately) override;

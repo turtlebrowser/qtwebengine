@@ -403,6 +403,12 @@ void ExtensionSystemQt::InstallUpdate(const std::string &extension_id,
 }
 #endif
 
+void ExtensionSystemQt::PerformActionBasedOnOmahaAttributes(const std::string& extension_id,
+                                                            const base::Value& attributes)
+{
+    NOTREACHED() << "Not yet implemented";
+}
+
 void ExtensionSystemQt::RegisterExtensionWithRequestContexts(const Extension *extension,
                                                              base::OnceClosure callback)
 {

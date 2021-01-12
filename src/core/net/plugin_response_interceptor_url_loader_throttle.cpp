@@ -95,12 +95,12 @@ void onPdfStreamIntercepted(const GURL &original_url, std::string extension_id, 
 PluginResponseInterceptorURLLoaderThrottle::PluginResponseInterceptorURLLoaderThrottle(
         content::ResourceContext *resource_context, int resource_type, int frame_tree_node_id)
     : m_resource_context(resource_context), m_resource_type(resource_type), m_frame_tree_node_id(frame_tree_node_id)
-{}
+{Q_UNUSED(m_resource_type);}
 
 PluginResponseInterceptorURLLoaderThrottle::PluginResponseInterceptorURLLoaderThrottle(
         content::BrowserContext *browser_context, int resource_type, int frame_tree_node_id)
     : m_browser_context(browser_context), m_resource_type(resource_type), m_frame_tree_node_id(frame_tree_node_id)
-{}
+{Q_UNUSED(m_resource_type);}
 
 void PluginResponseInterceptorURLLoaderThrottle::WillProcessResponse(const GURL &response_url,
                                                                      network::mojom::URLResponseHead *response_head,

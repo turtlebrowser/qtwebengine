@@ -260,7 +260,7 @@ bool ContentRendererClientQt::HasErrorPage(int httpStatusCode)
     return true;
 }
 
-bool ContentRendererClientQt::ShouldSuppressErrorPage(content::RenderFrame *frame, const GURL &)
+bool ContentRendererClientQt::ShouldSuppressErrorPage(content::RenderFrame *frame, const GURL &, int error_code)
 {
     return !(frame->GetWebkitPreferences().enable_error_page);
 }

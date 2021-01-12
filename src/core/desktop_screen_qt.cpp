@@ -64,6 +64,12 @@ gfx::NativeWindow DesktopScreenQt::GetWindowAtScreenPoint(const gfx::Point& poin
     return gfx::NativeWindow();
 }
 
+gfx::NativeWindow DesktopScreenQt::GetLocalProcessWindowAtPoint(const gfx::Point& point, const std::set<gfx::NativeWindow>& ignore)
+{
+    Q_UNREACHABLE();
+    return gfx::NativeWindow();
+}
+
 int DesktopScreenQt::GetNumDisplays() const
 {
     Q_UNREACHABLE();

@@ -50,6 +50,7 @@ public:
     gfx::Point GetCursorScreenPoint() override;
     bool IsWindowUnderCursor(gfx::NativeWindow) override;
     gfx::NativeWindow GetWindowAtScreenPoint(const gfx::Point& point) override;
+    gfx::NativeWindow GetLocalProcessWindowAtPoint(const gfx::Point& point, const std::set<gfx::NativeWindow>& ignore) override;
     int GetNumDisplays() const override;
     std::vector<display::Display>& GetAllDisplays() const override;
     display::Display GetDisplayNearestWindow(gfx::NativeWindow window) const override;

@@ -379,13 +379,13 @@ static void Navigate(WebContentsAdapter *adapter, const content::NavigationContr
     adapter->resetSelection();
 }
 
-static void NavigateTask(QWeakPointer<WebContentsAdapter> weakAdapter, const content::NavigationController::LoadURLParams &params)
+static void NavigateTask(QWeakPointer<WebContentsAdapter> weakAdapter, std::unique_ptr<content::NavigationController::LoadURLParams> params)
 {
     DCHECK_CURRENTLY_ON(content::BrowserThread::UI);
     const auto adapter = weakAdapter.toStrongRef();
     if (!adapter)
         return;
-    Navigate(adapter.get(), params);
+    Navigate(adapter.get(), *params);
 }
 
 namespace {
@@ -540,7 +540,13 @@ void WebContentsAdapter::initialize(content::SiteInstance *site)
     content::RenderViewHost *rvh = m_webContents->GetRenderViewHost();
     Q_ASSERT(rvh);
     if (!rvh->IsRenderViewLive())
-        static_cast<content::WebContentsImpl*>(m_webContents.get())->CreateRenderViewForRenderManager(rvh, MSG_ROUTING_NONE, MSG_ROUTING_NONE, base::UnguessableToken::Create(), content::FrameReplicationState());
+        static_cast<content::WebContentsImpl*>(m_webContents.get())->CreateRenderViewForRenderManager(
+                rvh,
+                MSG_ROUTING_NONE,
+                MSG_ROUTING_NONE,
+                base::UnguessableToken::Create(),
+                base::UnguessableToken::Create(),
+                content::FrameReplicationState());
 
     m_webContentsDelegate->RenderViewHostChanged(nullptr, rvh);
 
@@ -691,27 +697,27 @@ void WebContentsAdapter::load(const QWebEngineHttpRequest &request)
         }
     }
 
-    content::NavigationController::LoadURLParams params(gurl);
-    params.transition_type = ui::PageTransitionFromInt(ui::PAGE_TRANSITION_TYPED
+    auto params = std::make_unique<content::NavigationController::LoadURLParams>(gurl);
+    params->transition_type = ui::PageTransitionFromInt(ui::PAGE_TRANSITION_TYPED
                                                      | ui::PAGE_TRANSITION_FROM_ADDRESS_BAR);
-    params.override_user_agent = content::NavigationController::UA_OVERRIDE_TRUE;
+    params->override_user_agent = content::NavigationController::UA_OVERRIDE_TRUE;
 
     switch (request.method()) {
     case QWebEngineHttpRequest::Get:
-        params.load_type = content::NavigationController::LOAD_TYPE_DEFAULT;
+        params->load_type = content::NavigationController::LOAD_TYPE_DEFAULT;
         break;
 
     case QWebEngineHttpRequest::Post:
-        params.load_type = content::NavigationController::LOAD_TYPE_HTTP_POST;
+        params->load_type = content::NavigationController::LOAD_TYPE_HTTP_POST;
         // chromium accepts LOAD_TYPE_HTTP_POST only for the HTTP and HTTPS protocols
-        if (!params.url.SchemeIsHTTPOrHTTPS()) {
+        if (!params->url.SchemeIsHTTPOrHTTPS()) {
             m_adapterClient->loadFinished(false, request.url(), false,
                                            net::ERR_DISALLOWED_URL_SCHEME,
                                            QCoreApplication::translate("WebContentsAdapter",
                                            "HTTP-POST data can only be sent over HTTP(S) protocol"));
             return;
         }
-        params.post_data = network::ResourceRequestBody::CreateFromBytes(
+        params->post_data = network::ResourceRequestBody::CreateFromBytes(
                     (const char*)request.postData().constData(),
                     request.postData().length());
         break;
@@ -720,9 +726,9 @@ void WebContentsAdapter::load(const QWebEngineHttpRequest &request)
     // convert the custom headers into the format that chromium expects
     QVector<QByteArray> headers = request.headers();
     for (QVector<QByteArray>::const_iterator it = headers.cbegin(); it != headers.cend(); ++it) {
-        if (params.extra_headers.length() > 0)
-            params.extra_headers += '\n';
-        params.extra_headers += (*it).toStdString() + ": " + request.header(*it).toStdString();
+        if (params->extra_headers.length() > 0)
+            params->extra_headers += '\n';
+        params->extra_headers += (*it).toStdString() + ": " + request.header(*it).toStdString();
     }
 
     bool resizeNeeded = false;
@@ -738,7 +744,7 @@ void WebContentsAdapter::load(const QWebEngineHttpRequest &request)
         base::PostTask(FROM_HERE, {content::BrowserThread::UI},
                        base::BindOnce(&NavigateTask, sharedFromThis().toWeakRef(), std::move(params)));
     } else {
-        Navigate(this, params);
+        Navigate(this, *params);
     }
 }
 
@@ -2022,6 +2028,7 @@ void WebContentsAdapter::undiscard()
     if (!rvh->IsRenderViewLive())
         static_cast<content::WebContentsImpl *>(m_webContents.get())
                 ->CreateRenderViewForRenderManager(rvh, MSG_ROUTING_NONE, MSG_ROUTING_NONE,
+                                                   base::UnguessableToken::Create(),
                                                    base::UnguessableToken::Create(),
                                                    content::FrameReplicationState());
     m_webContentsDelegate->RenderViewHostChanged(nullptr, rvh);

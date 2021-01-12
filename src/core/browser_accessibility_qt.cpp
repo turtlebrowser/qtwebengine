@@ -207,6 +207,7 @@ QAccessible::Role BrowserAccessibilityQt::role() const
     switch (GetRole()) {
     case ax::mojom::Role::kNone:
     case ax::mojom::Role::kUnknown:
+    case ax::mojom::Role::kImeCandidate:
         return QAccessible::NoRole;
 
     // Used by Chromium to distinguish between the root of the tree
@@ -644,22 +645,6 @@ QAccessible::State BrowserAccessibilityQt::state() const
         }
     }
     return state;
-}
-
-// Qt does not reference count accessibles
-void BrowserAccessibilityQt::NativeAddReference()
-{
-}
-
-// there is no reference counting, but BrowserAccessibility::Destroy
-// calls this (and that is the only place in the chromium sources,
-// so we can safely use it to dispose of ourselves here
-// (the default implementation of this function just contains a "delete this")
-void BrowserAccessibilityQt::NativeReleaseReference()
-{
-    // delete this
-    QAccessible::Id interfaceId = QAccessible::uniqueId(this);
-    QAccessible::deleteAccessibleInterface(interfaceId);
 }
 
 QStringList BrowserAccessibilityQt::actionNames() const

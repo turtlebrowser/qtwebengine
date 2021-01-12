@@ -90,7 +90,7 @@ public:
     void ExposeInterfacesToBrowser(mojo::BinderMap* binders) override;
     void RenderViewCreated(content::RenderView *render_view) override;
     void RenderFrameCreated(content::RenderFrame *render_frame) override;
-    bool ShouldSuppressErrorPage(content::RenderFrame *, const GURL &) override;
+    bool ShouldSuppressErrorPage(content::RenderFrame *, const GURL &, int error_code) override;
     bool HasErrorPage(int http_status_code) override;
 
     void PrepareErrorPage(content::RenderFrame *render_frame,
