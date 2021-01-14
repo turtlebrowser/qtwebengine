@@ -8,4 +8,4 @@ solutions = [
     "custom_vars": {},
   },
 ]
-target_os = ["linux"]
+target_os = ["linux", "mac"]
