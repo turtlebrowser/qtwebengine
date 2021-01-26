@@ -55,7 +55,6 @@
 #include "ui/base/layout.h"
 #include "ui/base/l10n/l10n_util.h"
 #include "ui/base/resource/resource_bundle.h"
-#include "services/service_manager/switches.h"
 #include "type_conversion.h"
 
 #include <QCoreApplication>
