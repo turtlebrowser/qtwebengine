@@ -224,8 +224,8 @@ void ContentMainDelegateQt::PreSandboxStartup()
     }
 #endif
 
-    if (parsedCommandLine->HasSwitch(service_manager::switches::kApplicationName)) {
-        std::string appName = parsedCommandLine->GetSwitchValueASCII(service_manager::switches::kApplicationName);
+    if (parsedCommandLine->HasSwitch(switches::kApplicationName)) {
+        std::string appName = parsedCommandLine->GetSwitchValueASCII(switches::kApplicationName);
         appName = QByteArray::fromPercentEncoding(QByteArray::fromStdString(appName)).toStdString();
         QCoreApplication::setApplicationName(QString::fromStdString(appName));
 #if defined(OS_LINUX)
