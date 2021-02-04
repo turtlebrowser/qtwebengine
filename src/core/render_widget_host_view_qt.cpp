@@ -839,13 +839,11 @@ void RenderWidgetHostViewQt::OnTextSelectionChanged(content::TextInputManager *t
         return;
 
 #if defined(USE_OZONE)
-#if defined(HAS_TEXT_SELECTION_PATCH)
     if (!selection->selected_text().empty() && selection->user_initiated()) {
         // Set the CLIPBOARD_TYPE_SELECTION to the ui::Clipboard.
         ui::ScopedClipboardWriter clipboard_writer(ui::ClipboardBuffer::kSelection);
         clipboard_writer.WriteText(selection->selected_text());
     }
-#endif
 #endif // defined(USE_OZONE)
 
     m_imState |= ImStateFlags::TextSelectionUpdated;

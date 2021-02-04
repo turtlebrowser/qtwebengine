@@ -1743,11 +1743,7 @@ void WebContentsAdapter::resetSelection()
     if (auto rwhv = static_cast<RenderWidgetHostViewQt *>(m_webContents->GetRenderWidgetHostView())) {
         if (auto mgr = rwhv->GetTextInputManager())
             if (auto selection = const_cast<content::TextInputManager::TextSelection *>(mgr->GetTextSelection(rwhv)))
-#if defined(HAS_TEXT_SELECTION_PATCH)
                 selection->SetSelection(base::string16(), 0, gfx::Range(), false);
-#else
-                selection->SetSelection(base::string16(), 0, gfx::Range());
-#endif
     }
 }
 
