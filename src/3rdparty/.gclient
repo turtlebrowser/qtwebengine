@@ -1,11 +1,11 @@
 solutions = [
   { "name"        : 'chromium',
-    "url"         : 'git@github.com:turtlebrowser/chromium.git',
+    "url"         : 'https://github.com/chromium/chromium.git',
     "deps_file"   : 'DEPS',
     "managed"     : False,
     "custom_deps" : {
     },
-    "custom_vars": {},
+    "custom_vars": {'checkout_nacl': False},
   },
 ]
-target_os = ["linux", "mac"]
+target_os = ["linux", "mac", "win"]
