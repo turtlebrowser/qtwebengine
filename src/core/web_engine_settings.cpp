@@ -385,8 +385,8 @@ void WebEngineSettings::applySettingsToWebPreferences(blink::web_pref::WebPrefer
     prefs->hide_scrollbars = !testAttribute(ShowScrollBars);
     if (isAttributeExplicitlySet(PlaybackRequiresUserGesture)) {
         prefs->autoplay_policy = testAttribute(PlaybackRequiresUserGesture)
-                               ? blink::web_pref::AutoplayPolicy::kUserGestureRequired
-                               : blink::web_pref::AutoplayPolicy::kNoUserGestureRequired;
+                               ? blink::mojom::AutoplayPolicy::kUserGestureRequired
+                               : blink::mojom::AutoplayPolicy::kNoUserGestureRequired;
     }
     prefs->dom_paste_enabled = testAttribute(JavascriptCanPaste);
     prefs->dns_prefetching_enabled = testAttribute(DnsPrefetchEnabled);
@@ -449,7 +449,7 @@ void WebEngineSettings::applySettingsToWebPreferences(blink::web_pref::WebPrefer
     }
 }
 
-bool WebEngineSettings::applySettingsToRendererPreferences(blink::mojom::RendererPreferences *prefs)
+bool WebEngineSettings::applySettingsToRendererPreferences(blink::RendererPreferences *prefs)
 {
     bool changed = false;
 #if QT_CONFIG(webengine_webrtc)

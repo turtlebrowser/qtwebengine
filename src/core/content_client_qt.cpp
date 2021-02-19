@@ -133,15 +133,19 @@ static QString getProgramFilesDir(bool x86Dir = false)
 #include "content/public/common/pepper_plugin_info.h"
 #include "ppapi/shared_impl/ppapi_permissions.h"
 
+#ifdef HAS_FLASH
 static const int32_t kPepperFlashPermissions = ppapi::PERMISSION_DEV |
                                                ppapi::PERMISSION_PRIVATE |
                                                ppapi::PERMISSION_BYPASS_USER_GESTURE |
                                                ppapi::PERMISSION_FLASH |
                                                ppapi::PERMISSION_SOCKET;
+#endif
 
 namespace switches {
+#ifdef HAS_FLASH
 const char kPpapiFlashPath[]    = "ppapi-flash-path";
 const char kPpapiFlashVersion[] = "ppapi-flash-version";
+#endif
 const char kPpapiWidevinePath[] = "ppapi-widevine-path";
 }
 
@@ -158,7 +162,7 @@ static QString ppapiPluginsPath()
     return potentialPluginsPath;
 }
 
-
+#ifdef HAS_FLASH
 content::PepperPluginInfo CreatePepperFlashInfo(const base::FilePath& path, const std::string& version)
 {
     content::PepperPluginInfo plugin;
@@ -246,6 +250,7 @@ void AddPepperFlashFromCommandLine(std::vector<content::PepperPluginInfo>* plugi
     std::string flash_version = base::CommandLine::ForCurrentProcess()->GetSwitchValueASCII(switches::kPpapiFlashVersion);
     plugins->push_back(CreatePepperFlashInfo(base::FilePath(flash_path), flash_version));
 }
+#endif // HAS_FLASH
 
 void ComputeBuiltInPlugins(std::vector<content::PepperPluginInfo>* plugins)
 {
@@ -271,8 +276,10 @@ namespace QtWebEngineCore {
 void ContentClientQt::AddPepperPlugins(std::vector<content::PepperPluginInfo>* plugins)
 {
     ComputeBuiltInPlugins(plugins);
+#ifdef HAS_FLASH
     AddPepperFlashFromSystem(plugins);
     AddPepperFlashFromCommandLine(plugins);
+#endif // HAS_FLASH
 }
 
 } // namespace QtWebEngineCore

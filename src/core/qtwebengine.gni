@@ -57,9 +57,9 @@ if (use_ozone) {
   deps += [ "$_ozone_extra_directory:qt" ]
 }
 
-if (use_xscrnsaver) {
+#if (use_xscrnsaver) {
   deps += [ "//ui/base/x" ]
-}
+#}
 
 if (enable_extensions) {
   deps += [

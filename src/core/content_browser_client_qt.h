@@ -155,6 +155,7 @@ public:
                        const GURL &first_party,
                        const base::Optional<url::Origin> &top_frame_origin,
                        content::BrowserContext *context) override;
+#if 0
     content::AllowServiceWorkerResult AllowServiceWorkerOnIO(
             const GURL &scope,
             const GURL &site_for_cookies,
@@ -167,6 +168,7 @@ public:
             const base::Optional<url::Origin> &top_frame_origin,
             const GURL &script_url,
             content::BrowserContext *context) override;
+#endif
 
     void AllowWorkerFileSystem(const GURL &url,
                                content::BrowserContext *context,
@@ -236,7 +238,7 @@ public:
                                     URLLoaderFactoryType type,
                                     const url::Origin &request_initiator,
                                     base::Optional<int64_t> navigation_id,
-                                    base::UkmSourceId ukm_source_id,
+                                    ukm::SourceIdObj ukm_source_id,
                                     mojo::PendingReceiver<network::mojom::URLLoaderFactory> *factory_receiver,
                                     mojo::PendingRemote<network::mojom::TrustedURLLoaderHeaderClient> *header_client,
                                     bool *bypass_redirect_checks,
@@ -252,11 +254,9 @@ public:
                                        network::mojom::CertVerifierCreationParams *cert_verifier_creation_params) override;
 
     std::vector<base::FilePath> GetNetworkContextsParentDirectory() override;
-    void RegisterNonNetworkNavigationURLLoaderFactories(int frame_tree_node_id, base::UkmSourceId ukm_source_id,
-                                                        NonNetworkURLLoaderFactoryDeprecatedMap *uniquely_owned_factories,
+    void RegisterNonNetworkNavigationURLLoaderFactories(int frame_tree_node_id, ukm::SourceIdObj ukm_source_id,
                                                         NonNetworkURLLoaderFactoryMap *factories) override;
     void RegisterNonNetworkSubresourceURLLoaderFactories(int render_process_id, int render_frame_id,
-                                                         NonNetworkURLLoaderFactoryDeprecatedMap *uniquely_owned_factories,
                                                          NonNetworkURLLoaderFactoryMap *factories) override;
     void RegisterNonNetworkWorkerMainResourceURLLoaderFactories(content::BrowserContext* browser_context,
                                                                 NonNetworkURLLoaderFactoryMap* factories) override;

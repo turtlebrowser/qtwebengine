@@ -51,6 +51,7 @@ ContentUtilityClientQt::ContentUtilityClientQt()
 
 ContentUtilityClientQt::~ContentUtilityClientQt() = default;
 
+#if 0
 auto RunProxyResolver(mojo::PendingReceiver<proxy_resolver::mojom::ProxyResolverFactory> receiver)
 {
     return std::make_unique<proxy_resolver::ProxyResolverFactoryImpl>(std::move(receiver));
@@ -63,5 +64,6 @@ mojo::ServiceFactory *ContentUtilityClientQt::GetIOThreadServiceFactory()
     };
     return factory.get();
 }
+#endif
 
 } // namespace

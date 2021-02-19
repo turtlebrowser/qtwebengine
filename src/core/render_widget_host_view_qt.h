@@ -161,11 +161,13 @@ public:
 
     void GetScreenInfo(blink::ScreenInfo *results) override;
     gfx::Rect GetBoundsInRootWindow() override;
+    base::Optional<content::DisplayFeature> GetDisplayFeature() override;
+    void SetDisplayFeatureForTesting(const content::DisplayFeature* display_feature) override;
     void ProcessAckedTouchEvent(const content::TouchEventWithLatencyInfo &touch,
                                 blink::mojom::InputEventResultState ack_result) override;
     viz::SurfaceId GetCurrentSurfaceId() const override;
     const viz::FrameSinkId &GetFrameSinkId() const override;
-    const viz::LocalSurfaceId &GetLocalSurfaceId() const;
+    const viz::LocalSurfaceId &GetLocalSurfaceId() const override;
 
     void TakeFallbackContentFrom(content::RenderWidgetHostView *view) override;
     void EnsureSurfaceSynchronizedForWebTest() override;

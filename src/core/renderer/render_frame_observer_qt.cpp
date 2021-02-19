@@ -37,21 +37,27 @@
 **
 ****************************************************************************/
 
+#ifdef HAS_FLASH
 // This is based on chrome/renderer/pepper/pepper_helper.cc:
 // Copyright (c) 2012 The Chromium Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE.Chromium file.
+#endif
 
 #include "render_frame_observer_qt.h"
 
 #include "base/memory/ptr_util.h"
+#ifdef HAS_FLASH
 #include "chrome/renderer/pepper/pepper_shared_memory_message_filter.h"
+#endif // HAS_FLASH
 #include "components/web_cache/renderer/web_cache_impl.h"
 #include "content/public/renderer/render_frame.h"
 #include "content/public/renderer/renderer_ppapi_host.h"
 #include "ppapi/host/ppapi_host.h"
 
+#ifdef HAS_FLASH
 #include "renderer/pepper/pepper_renderer_host_factory_qt.h"
+#endif
 
 namespace QtWebEngineCore {
 
@@ -69,6 +75,7 @@ void RenderFrameObserverQt::OnDestruct()
     delete this;
 }
 
+#ifdef HAS_FLASH
 #if QT_CONFIG(webengine_pepper_plugins)
 void RenderFrameObserverQt::DidCreatePepperPlugin(content::RendererPpapiHost *host)
 {
@@ -76,6 +83,7 @@ void RenderFrameObserverQt::DidCreatePepperPlugin(content::RendererPpapiHost *ho
     host->GetPpapiHost()->AddInstanceMessageFilter(base::WrapUnique(new PepperSharedMemoryMessageFilter(host)));
 }
 #endif
+#endif // HAS_FLASH
 
 void RenderFrameObserverQt::WillDetach()
 {

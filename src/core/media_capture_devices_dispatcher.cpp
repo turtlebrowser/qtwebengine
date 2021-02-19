@@ -202,13 +202,20 @@ public:
     }
 
 private:
-    gfx::NativeViewId OnStarted(base::OnceClosure, SourceCallback) override
+    gfx::NativeViewId OnStarted(base::OnceClosure, SourceCallback, const std::string&, std::vector<content::DesktopMediaID>, StateChangeCallback) override
     {
         DCHECK(!m_started);
         m_started = true;
         if (m_delegate)
             m_delegate->addDevices(m_devices);
         return 0;
+    }
+
+    void OnDeviceStopped(const std::string& label, const content::DesktopMediaID& media_id) override {
+        QT_NOT_YET_IMPLEMENTED
+    }
+    void SetStopCallback(base::OnceClosure stop) override {
+        QT_NOT_YET_IMPLEMENTED
     }
 
     base::WeakPtr<WebContentsDelegateQt> m_delegate;

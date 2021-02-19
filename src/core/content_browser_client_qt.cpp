@@ -156,7 +156,9 @@
 #if QT_CONFIG(webengine_pepper_plugins)
 #include "content/public/browser/browser_ppapi_host.h"
 #include "ppapi/host/ppapi_host.h"
+#ifdef HAS_FLASH
 #include "renderer_host/pepper/pepper_host_factory_qt.h"
+#endif // HAS_FLASH
 #endif
 
 #if QT_CONFIG(webengine_geolocation)
@@ -536,7 +538,7 @@ void ContentBrowserClientQt::GetAdditionalMappedFilesForChildProcess(const base:
 }
 #endif
 
-#if QT_CONFIG(webengine_pepper_plugins)
+#ifdef HAS_FLASH
 void ContentBrowserClientQt::DidCreatePpapiPlugin(content::BrowserPpapiHost* browser_host)
 {
     browser_host->GetPpapiHost()->AddHostFactoryFilter(
@@ -752,6 +754,7 @@ bool ContentBrowserClientQt::AllowAppCache(const GURL &manifest_url,
     return static_cast<ProfileQt *>(context)->profileAdapter()->cookieStore()->d_func()->canAccessCookies(toQt(first_party), toQt(manifest_url));
 }
 
+#if 0
 content::AllowServiceWorkerResult
 ContentBrowserClientQt::AllowServiceWorkerOnIO(const GURL &scope,
                                                     const GURL &site_for_cookies,
@@ -781,6 +784,7 @@ ContentBrowserClientQt::AllowServiceWorkerOnUI(const GURL &scope,
          ? content::AllowServiceWorkerResult::Yes()
          : content::AllowServiceWorkerResult::No();
 }
+#endif
 
 // We control worker access to FS and indexed-db using cookie permissions, this is mirroring Chromium's logic.
 void ContentBrowserClientQt::AllowWorkerFileSystem(const GURL &url,
@@ -1095,11 +1099,9 @@ std::vector<base::FilePath> ContentBrowserClientQt::GetNetworkContextsParentDire
 }
 
 void ContentBrowserClientQt::RegisterNonNetworkNavigationURLLoaderFactories(int frame_tree_node_id,
-                                                                            base::UkmSourceId ukm_source_id,
-                                                                            NonNetworkURLLoaderFactoryDeprecatedMap *uniquely_owned_factories,
+                                                                            ukm::SourceIdObj ukm_source_id,
                                                                             NonNetworkURLLoaderFactoryMap *factories)
 {
-    Q_UNUSED(uniquely_owned_factories);
     content::WebContents *web_contents = content::WebContents::FromFrameTreeNodeId(frame_tree_node_id);
     Profile *profile = Profile::FromBrowserContext(web_contents->GetBrowserContext());
     ProfileAdapter *profileAdapter = static_cast<ProfileQt *>(profile)->profileAdapter();
@@ -1126,10 +1128,8 @@ void ContentBrowserClientQt::RegisterNonNetworkWorkerMainResourceURLLoaderFactor
 }
 
 void ContentBrowserClientQt::RegisterNonNetworkSubresourceURLLoaderFactories(int render_process_id, int render_frame_id,
-                                                                             NonNetworkURLLoaderFactoryDeprecatedMap *uniquely_owned_factories,
                                                                              NonNetworkURLLoaderFactoryMap *factories)
 {
-    Q_UNUSED(uniquely_owned_factories);
     content::RenderProcessHost *process_host = content::RenderProcessHost::FromID(render_process_id);
     Profile *profile = Profile::FromBrowserContext(process_host->GetBrowserContext());
     ProfileAdapter *profileAdapter = static_cast<ProfileQt *>(profile)->profileAdapter();
@@ -1209,7 +1209,7 @@ bool ContentBrowserClientQt::WillCreateURLLoaderFactory(
         URLLoaderFactoryType type,
         const url::Origin &request_initiator,
         base::Optional<int64_t> navigation_id,
-        base::UkmSourceId ukm_source_id,
+        ukm::SourceIdObj ukm_source_id,
         mojo::PendingReceiver<network::mojom::URLLoaderFactory> *factory_receiver,
         mojo::PendingRemote<network::mojom::TrustedURLLoaderHeaderClient> *header_client,
         bool *bypass_redirect_checks,

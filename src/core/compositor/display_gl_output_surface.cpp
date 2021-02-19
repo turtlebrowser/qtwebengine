@@ -276,15 +276,15 @@ unsigned DisplayGLOutputSurface::UpdateGpuFence()
     return 0;
 }
 
-scoped_refptr<gpu::GpuTaskSchedulerHelper> DisplayGLOutputSurface::GetGpuTaskSchedulerHelper()
-{
-    return m_vizContextProvider->GetGpuTaskSchedulerHelper();
-}
+// scoped_refptr<gpu::GpuTaskSchedulerHelper> DisplayGLOutputSurface::GetGpuTaskSchedulerHelper()
+// {
+//     return m_vizContextProvider->GetGpuTaskSchedulerHelper();
+// }
 
-gpu::MemoryTracker *DisplayGLOutputSurface::GetMemoryTracker()
-{
-    return m_vizContextProvider->GetMemoryTracker();
-}
+// gpu::MemoryTracker *DisplayGLOutputSurface::GetMemoryTracker()
+// {
+//     return m_vizContextProvider->GetMemoryTracker();
+// }
 
 void DisplayGLOutputSurface::SetUpdateVSyncParametersCallback(viz::UpdateVSyncParametersCallback callback)
 {

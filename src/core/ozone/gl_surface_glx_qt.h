@@ -42,7 +42,8 @@
 
 #include "gl_surface_qt.h"
 
-#include "ui/gfx/x/x11_types.h"
+// #include "ui/gfx/x/x11_types.h"
+typedef unsigned long XID;
 
 namespace gl {
 

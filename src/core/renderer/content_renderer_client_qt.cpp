@@ -243,6 +243,7 @@ void ContentRendererClientQt::RunScriptsAtDocumentIdle(content::RenderFrame *ren
 #endif
 }
 
+#if defined(HAS_ERROR_PAGE_PATCH)
 bool ContentRendererClientQt::HasErrorPage(int httpStatusCode)
 {
     // Use an internal error page, if we have one for the status code.
@@ -252,6 +253,7 @@ bool ContentRendererClientQt::HasErrorPage(int httpStatusCode)
 
     return true;
 }
+#endif
 
 // To tap into the chromium localized strings. Ripped from the chrome layer (highly simplified).
 void ContentRendererClientQt::PrepareErrorPage(content::RenderFrame *renderFrame,
@@ -265,6 +267,7 @@ void ContentRendererClientQt::PrepareErrorPage(content::RenderFrame *renderFrame
             errorHtml);
 }
 
+#if defined(HAS_ERROR_PAGE_PATCH)
 void ContentRendererClientQt::PrepareErrorPageForHttpStatusError(content::RenderFrame *renderFrame,
                                                                  const GURL &unreachable_url,
                                                                  const std::string &httpMethod,
@@ -275,6 +278,7 @@ void ContentRendererClientQt::PrepareErrorPageForHttpStatusError(content::Render
                                       error_page::Error::HttpError(unreachable_url, http_status),
                                       errorHtml);
 }
+#endif
 
 void ContentRendererClientQt::GetNavigationErrorStringsInternal(content::RenderFrame *renderFrame,
                                                                 const std::string &httpMethod,
@@ -593,7 +597,7 @@ void ContentRendererClientQt::WillSendRequest(blink::WebLocalFrame *frame,
 #endif
 }
 
-bool ContentRendererClientQt::RequiresWebComponentsV0(const GURL &url)
+bool ContentRendererClientQt::RequiresHtmlImports(const GURL &url)
 {
     Q_UNUSED(url);
     return false;

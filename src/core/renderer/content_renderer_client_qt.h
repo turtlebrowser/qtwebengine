@@ -89,17 +89,21 @@ public:
     void RenderThreadStarted() override;
     void ExposeInterfacesToBrowser(mojo::BinderMap* binders) override;
     void RenderFrameCreated(content::RenderFrame *render_frame) override;
+#if defined(HAS_ERROR_PAGE_PATCH)
     bool HasErrorPage(int http_status_code) override;
+#endif
 
     void PrepareErrorPage(content::RenderFrame *render_frame,
                           const blink::WebURLError &error,
                           const std::string &http_method,
                           std::string *error_html) override;
+#if defined(HAS_ERROR_PAGE_PATCH)
     void PrepareErrorPageForHttpStatusError(content::RenderFrame *render_frame,
                                             const GURL &unreachable_url,
                                             const std::string &http_method,
                                             int http_status,
                                             std::string *error_html) override;
+#endif
 
     uint64_t VisitedLinkHash(const char *canonical_url, size_t length) override;
     bool IsLinkVisited(uint64_t linkHash) override;
@@ -122,7 +126,7 @@ public:
                          GURL *new_url,
                          bool *attach_same_site_cookies) override;
 
-    bool RequiresWebComponentsV0(const GURL &url) override;
+    bool RequiresHtmlImports(const GURL &url) override;
 
 #if BUILDFLAG(ENABLE_PLUGINS)
     static blink::WebPlugin* CreatePlugin(content::RenderFrame* render_frame,

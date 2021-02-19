@@ -86,11 +86,11 @@ class PrintingMessageFilterQt : public content::BrowserMessageFilter {
   // Modify the current print settings based on |job_settings|. The task is
   // handled by the print worker thread and the UI thread. The reply occurs on
   // the IO thread.
-  void OnUpdatePrintSettings(int document_cookie,
-                             base::Value job_settings,
-                             IPC::Message* reply_msg);
-  void OnUpdatePrintSettingsReply(std::unique_ptr<printing::PrinterQuery> printer_query,
-                                  IPC::Message* reply_msg);
+  // void OnUpdatePrintSettings(int document_cookie,
+  //                            base::Value job_settings,
+  //                            IPC::Message* reply_msg);
+  // void OnUpdatePrintSettingsReply(std::unique_ptr<printing::PrinterQuery> printer_query,
+  //                                 IPC::Message* reply_msg);
 
   // Check to see if print preview has been cancelled.
   void OnCheckForCancel(const printing::mojom::PreviewIds& ids, bool* cancel);
