@@ -156,9 +156,7 @@
 #if QT_CONFIG(webengine_pepper_plugins)
 #include "content/public/browser/browser_ppapi_host.h"
 #include "ppapi/host/ppapi_host.h"
-#ifdef HAS_FLASH
 #include "renderer_host/pepper/pepper_host_factory_qt.h"
-#endif // HAS_FLASH
 #endif
 
 #if QT_CONFIG(webengine_geolocation)
@@ -538,7 +536,7 @@ void ContentBrowserClientQt::GetAdditionalMappedFilesForChildProcess(const base:
 }
 #endif
 
-#ifdef HAS_FLASH
+#if QT_CONFIG(webengine_pepper_plugins)
 void ContentBrowserClientQt::DidCreatePpapiPlugin(content::BrowserPpapiHost* browser_host)
 {
     browser_host->GetPpapiHost()->AddHostFactoryFilter(
