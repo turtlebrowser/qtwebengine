@@ -158,6 +158,7 @@ static QString ppapiPluginsPath()
     return potentialPluginsPath;
 }
 
+
 content::PepperPluginInfo CreatePepperFlashInfo(const base::FilePath& path, const std::string& version)
 {
     content::PepperPluginInfo plugin;
