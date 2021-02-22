@@ -155,20 +155,6 @@ public:
                        const GURL &first_party,
                        const base::Optional<url::Origin> &top_frame_origin,
                        content::BrowserContext *context) override;
-#if 0
-    content::AllowServiceWorkerResult AllowServiceWorkerOnIO(
-            const GURL &scope,
-            const GURL &site_for_cookies,
-            const base::Optional<url::Origin> &top_frame_origin,
-            const GURL &script_url,
-            content::ResourceContext *context) override;
-    content::AllowServiceWorkerResult AllowServiceWorkerOnUI(
-            const GURL &scope,
-            const GURL &site_for_cookies,
-            const base::Optional<url::Origin> &top_frame_origin,
-            const GURL &script_url,
-            content::BrowserContext *context) override;
-#endif
 
     void AllowWorkerFileSystem(const GURL &url,
                                content::BrowserContext *context,
