@@ -89,8 +89,6 @@ public:
     void SetUpdateVSyncParametersCallback(viz::UpdateVSyncParametersCallback callback) override;
     void SetDisplayTransformHint(gfx::OverlayTransform transform) override;
     gfx::OverlayTransform GetDisplayTransform() override;
-    // scoped_refptr<gpu::GpuTaskSchedulerHelper> GetGpuTaskSchedulerHelper() override;
-    // gpu::MemoryTracker *GetMemoryTracker() override;
 
     // Overridden from DisplayProducer.
     QSGNode *updatePaintNode(QSGNode *oldNode, RenderWidgetHostViewQtDelegate *delegate) override;
