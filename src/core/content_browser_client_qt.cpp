@@ -752,38 +752,6 @@ bool ContentBrowserClientQt::AllowAppCache(const GURL &manifest_url,
     return static_cast<ProfileQt *>(context)->profileAdapter()->cookieStore()->d_func()->canAccessCookies(toQt(first_party), toQt(manifest_url));
 }
 
-#if 0
-content::AllowServiceWorkerResult
-ContentBrowserClientQt::AllowServiceWorkerOnIO(const GURL &scope,
-                                                    const GURL &site_for_cookies,
-                                                    const base::Optional<url::Origin> & /*top_frame_origin*/,
-                                                    const GURL & /*script_url*/,
-                                                    content::ResourceContext *context)
-{
-    DCHECK_CURRENTLY_ON(content::BrowserThread::IO);
-    // FIXME: Chrome also checks if javascript is enabled here to check if has been disabled since the service worker
-    // was started.
-    return ProfileIODataQt::FromResourceContext(context)->canGetCookies(toQt(site_for_cookies), toQt(scope))
-         ? content::AllowServiceWorkerResult::Yes()
-         : content::AllowServiceWorkerResult::No();
-}
-
-content::AllowServiceWorkerResult
-ContentBrowserClientQt::AllowServiceWorkerOnUI(const GURL &scope,
-                                                    const GURL &site_for_cookies,
-                                                    const base::Optional<url::Origin> & /*top_frame_origin*/,
-                                                    const GURL & /*script_url*/,
-                                                    content::BrowserContext *context)
-{
-    DCHECK_CURRENTLY_ON(content::BrowserThread::UI);
-    // FIXME: Chrome also checks if javascript is enabled here to check if has been disabled since the service worker
-    // was started.
-    return static_cast<ProfileQt *>(context)->profileAdapter()->cookieStore()->d_func()->canAccessCookies(toQt(site_for_cookies), toQt(scope))
-         ? content::AllowServiceWorkerResult::Yes()
-         : content::AllowServiceWorkerResult::No();
-}
-#endif
-
 // We control worker access to FS and indexed-db using cookie permissions, this is mirroring Chromium's logic.
 void ContentBrowserClientQt::AllowWorkerFileSystem(const GURL &url,
                                                    content::BrowserContext *context,
