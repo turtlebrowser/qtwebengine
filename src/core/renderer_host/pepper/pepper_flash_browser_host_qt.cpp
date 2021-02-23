@@ -51,7 +51,7 @@
 #include "content/public/browser/render_process_host.h"
 #include "ipc/ipc_message_macros.h"
 #include "ppapi/c/pp_errors.h"
-#include "ppapi/c/private/ppb_flash.h"
+// #include "ppapi/c/private/ppb_flash.h"
 #include "ppapi/host/dispatch_host_message.h"
 #include "ppapi/proxy/ppapi_messages.h"
 #include "ppapi/proxy/resource_message_params.h"
@@ -88,14 +88,14 @@ int32_t PepperFlashBrowserHostQt::OnResourceMessageReceived(
         const IPC::Message& msg,
         ppapi::host::HostMessageContext* context)
 {
-    PPAPI_BEGIN_MESSAGE_MAP(PepperFlashBrowserHostQt, msg)
-    PPAPI_DISPATCH_HOST_RESOURCE_CALL_0(PpapiHostMsg_Flash_UpdateActivity,
-                                        OnUpdateActivity)
-    PPAPI_DISPATCH_HOST_RESOURCE_CALL(PpapiHostMsg_Flash_GetLocalTimeZoneOffset,
-                                      OnGetLocalTimeZoneOffset)
-    PPAPI_DISPATCH_HOST_RESOURCE_CALL_0(PpapiHostMsg_Flash_GetLocalDataRestrictions,
-                                        OnGetLocalDataRestrictions)
-    PPAPI_END_MESSAGE_MAP()
+    // PPAPI_BEGIN_MESSAGE_MAP(PepperFlashBrowserHostQt, msg)
+    // PPAPI_DISPATCH_HOST_RESOURCE_CALL_0(PpapiHostMsg_Flash_UpdateActivity,
+    //                                     OnUpdateActivity)
+    // PPAPI_DISPATCH_HOST_RESOURCE_CALL(PpapiHostMsg_Flash_GetLocalTimeZoneOffset,
+    //                                   OnGetLocalTimeZoneOffset)
+    // PPAPI_DISPATCH_HOST_RESOURCE_CALL_0(PpapiHostMsg_Flash_GetLocalDataRestrictions,
+    //                                     OnGetLocalDataRestrictions)
+    // PPAPI_END_MESSAGE_MAP()
     return PP_ERROR_FAILED;
 }
 
@@ -122,8 +122,8 @@ int32_t PepperFlashBrowserHostQt::OnGetLocalTimeZoneOffset(
     // The reason for this processing being in the browser process is that on
     // Linux, the localtime calls require filesystem access prohibited by the
     // sandbox.
-    host_context->reply_msg = PpapiPluginMsg_Flash_GetLocalTimeZoneOffsetReply(
-                ppapi::PPGetLocalTimeZoneOffset(t));
+    // host_context->reply_msg = PpapiPluginMsg_Flash_GetLocalTimeZoneOffsetReply(
+    //             ppapi::PPGetLocalTimeZoneOffset(t));
     return PP_OK;
 }
 

@@ -81,24 +81,24 @@ std::unique_ptr<ppapi::host::ResourceHost> PepperRendererHostFactoryQt::CreateRe
     if (!host_->IsValidInstance(instance))
         return nullptr;
 
-    if (host_->GetPpapiHost()->permissions().HasPermission(ppapi::PERMISSION_FLASH)) {
-        switch (message.type()) {
-        case PpapiHostMsg_Flash_Create::ID:
-            return base::WrapUnique(new PepperFlashRendererHostQt(host_, instance, resource));
-        case PpapiHostMsg_FlashMenu_Create::ID: {
-            ppapi::host::ReplyMessageContext reply_context(
-                ppapi::proxy::ResourceMessageReplyParams(resource, 0),
-                NULL,
-                MSG_ROUTING_NONE);
-            reply_context.params.set_result(PP_ERROR_USERCANCEL);
-            host_->GetPpapiHost()->SendReply(reply_context, PpapiPluginMsg_FlashMenu_ShowReply(-1));
-            break;
-        }
-        case PpapiHostMsg_FlashFullscreen_Create::ID:
-            // Not implemented
-            break;
-        }
-    }
+    // if (host_->GetPpapiHost()->permissions().HasPermission(ppapi::PERMISSION_FLASH)) {
+    //     switch (message.type()) {
+    //     case PpapiHostMsg_Flash_Create::ID:
+    //         return base::WrapUnique(new PepperFlashRendererHostQt(host_, instance, resource));
+    //     case PpapiHostMsg_FlashMenu_Create::ID: {
+    //         ppapi::host::ReplyMessageContext reply_context(
+    //             ppapi::proxy::ResourceMessageReplyParams(resource, 0),
+    //             NULL,
+    //             MSG_ROUTING_NONE);
+    //         reply_context.params.set_result(PP_ERROR_USERCANCEL);
+    //         host_->GetPpapiHost()->SendReply(reply_context, PpapiPluginMsg_FlashMenu_ShowReply(-1));
+    //         break;
+    //     }
+    //     case PpapiHostMsg_FlashFullscreen_Create::ID:
+    //         // Not implemented
+    //         break;
+    //     }
+    // }
 
     // TODO(raymes): PDF also needs access to the FlashFontFileHost currently.
     // We should either rename PPB_FlashFont_File to PPB_FontFile_Private or get
@@ -113,9 +113,9 @@ std::unique_ptr<ppapi::host::ResourceHost> PepperRendererHostFactoryQt::CreateRe
                 return base::WrapUnique(new PepperFlashFontFileHost(host_, instance, resource, description, charset));
             break;
         }
-        case PpapiHostMsg_FlashDRM_Create::ID:
-            // Not implemented
-            break;
+        // case PpapiHostMsg_FlashDRM_Create::ID:
+        //     // Not implemented
+        //     break;
         }
     }
 

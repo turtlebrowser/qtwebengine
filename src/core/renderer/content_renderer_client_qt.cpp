@@ -261,10 +261,12 @@ void ContentRendererClientQt::PrepareErrorPage(content::RenderFrame *renderFrame
                                                const std::string &httpMethod,
                                                std::string *errorHtml)
 {
+#if defined(HAS_ERROR_PAGE_PATCH)
     GetNavigationErrorStringsInternal(
             renderFrame, httpMethod,
             error_page::Error::NetError((GURL)web_error.url(), web_error.reason(), net::ResolveErrorInfo(), web_error.has_copy_in_cache()),
             errorHtml);
+#endif
 }
 
 #if defined(HAS_ERROR_PAGE_PATCH)

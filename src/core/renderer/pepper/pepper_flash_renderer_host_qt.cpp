@@ -202,19 +202,19 @@ int32_t PepperFlashRendererHostQt::OnResourceMessageReceived(
         const IPC::Message& msg,
         ppapi::host::HostMessageContext* context)
 {
-    PPAPI_BEGIN_MESSAGE_MAP(PepperFlashRendererHostQt, msg)
-            PPAPI_DISPATCH_HOST_RESOURCE_CALL(PpapiHostMsg_Flash_GetProxyForURL,
-                                              OnGetProxyForURL)
-            PPAPI_DISPATCH_HOST_RESOURCE_CALL(PpapiHostMsg_Flash_SetInstanceAlwaysOnTop,
-                                              OnSetInstanceAlwaysOnTop)
-            PPAPI_DISPATCH_HOST_RESOURCE_CALL(PpapiHostMsg_Flash_DrawGlyphs,
-                                              OnDrawGlyphs)
-            PPAPI_DISPATCH_HOST_RESOURCE_CALL(PpapiHostMsg_Flash_Navigate, OnNavigate)
-            PPAPI_DISPATCH_HOST_RESOURCE_CALL(PpapiHostMsg_Flash_IsRectTopmost,
-                                              OnIsRectTopmost)
-            PPAPI_DISPATCH_HOST_RESOURCE_CALL_0(PpapiHostMsg_Flash_InvokePrinting,
-                                                OnInvokePrinting)
-            PPAPI_END_MESSAGE_MAP()
+    // PPAPI_BEGIN_MESSAGE_MAP(PepperFlashRendererHostQt, msg)
+    //         PPAPI_DISPATCH_HOST_RESOURCE_CALL(PpapiHostMsg_Flash_GetProxyForURL,
+    //                                           OnGetProxyForURL)
+    //         PPAPI_DISPATCH_HOST_RESOURCE_CALL(PpapiHostMsg_Flash_SetInstanceAlwaysOnTop,
+    //                                           OnSetInstanceAlwaysOnTop)
+    //         PPAPI_DISPATCH_HOST_RESOURCE_CALL(PpapiHostMsg_Flash_DrawGlyphs,
+    //                                           OnDrawGlyphs)
+    //         PPAPI_DISPATCH_HOST_RESOURCE_CALL(PpapiHostMsg_Flash_Navigate, OnNavigate)
+    //         PPAPI_DISPATCH_HOST_RESOURCE_CALL(PpapiHostMsg_Flash_IsRectTopmost,
+    //                                           OnIsRectTopmost)
+    //         PPAPI_DISPATCH_HOST_RESOURCE_CALL_0(PpapiHostMsg_Flash_InvokePrinting,
+    //                                             OnInvokePrinting)
+    //         PPAPI_END_MESSAGE_MAP()
             return PP_ERROR_FAILED;
 }
 
@@ -222,15 +222,15 @@ int32_t PepperFlashRendererHostQt::OnGetProxyForURL(
         ppapi::host::HostMessageContext* host_context,
         const std::string& url)
 {
-    GURL gurl(url);
-    if (!gurl.is_valid())
+    // GURL gurl(url);
+    // if (!gurl.is_valid())
         return PP_ERROR_FAILED;
-    std::string proxy;
-    bool result = content::RenderThread::Get()->ResolveProxy(gurl, &proxy);
-    if (!result)
-        return PP_ERROR_FAILED;
-    host_context->reply_msg = PpapiPluginMsg_Flash_GetProxyForURLReply(proxy);
-    return PP_OK;
+    // std::string proxy;
+    // bool result = content::RenderThread::Get()->ResolveProxy(gurl, &proxy);
+    // if (!result)
+    //     return PP_ERROR_FAILED;
+    // host_context->reply_msg = PpapiPluginMsg_Flash_GetProxyForURLReply(proxy);
+    // return PP_OK;
 }
 
 int32_t PepperFlashRendererHostQt::OnSetInstanceAlwaysOnTop(
@@ -394,7 +394,7 @@ int32_t PepperFlashRendererHostQt::OnNavigate(
     // call. Even if we are destroyed, we still need to send these replies to
     // unblock the plugin process.
     navigate_replies_.push_back(host_context->MakeReplyMessageContext());
-    plugin_instance->Navigate(data, target.c_str(), from_user_action);
+    // plugin_instance->Navigate(data, target.c_str(), from_user_action);
     // This object might have been destroyed by this point. If it is destroyed
     // the reply will be sent in the destructor. Otherwise send the reply here.
     if (weak_ptr.get()) {
