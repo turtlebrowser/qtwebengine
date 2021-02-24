@@ -769,6 +769,17 @@ gfx::Rect RenderWidgetHostViewQt::GetBoundsInRootWindow()
     return m_windowRectInDips;
 }
 
+base::Optional<content::DisplayFeature> RenderWidgetHostViewQt::GetDisplayFeature() {
+    // FIXME: not implemented?
+    QT_NOT_YET_IMPLEMENTED
+    return base::nullopt;
+}
+
+void RenderWidgetHostViewQt::SetDisplayFeatureForTesting(const content::DisplayFeature* display_feature) {
+    // FIXME: not implemented?
+    QT_NOT_YET_IMPLEMENTED
+}
+
 void RenderWidgetHostViewQt::OnUpdateTextInputStateCalled(content::TextInputManager *text_input_manager, RenderWidgetHostViewBase *updated_view, bool did_update_state)
 {
     Q_UNUSED(text_input_manager);
@@ -838,7 +849,7 @@ void RenderWidgetHostViewQt::OnTextSelectionChanged(content::TextInputManager *t
     if (!selection)
         return;
 
-#if defined(USE_OZONE)
+#if defined(USE_OZONE) && defined(HAS_TEXT_SELECTION_PATCH)
     if (!selection->selected_text().empty() && selection->user_initiated()) {
         // Set the CLIPBOARD_TYPE_SELECTION to the ui::Clipboard.
         ui::ScopedClipboardWriter clipboard_writer(ui::ClipboardBuffer::kSelection);

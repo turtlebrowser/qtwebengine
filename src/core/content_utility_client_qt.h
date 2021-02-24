@@ -51,9 +51,6 @@ class ContentUtilityClientQt : public content::ContentUtilityClient {
 public:
     ContentUtilityClientQt();
     ~ContentUtilityClientQt() override;
-
-    // content::ContentUtilityClient:
-    mojo::ServiceFactory *GetIOThreadServiceFactory() override;
 };
 
 } // namespace

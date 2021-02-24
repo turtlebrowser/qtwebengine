@@ -43,9 +43,9 @@
 
 #include "gl_context_qt.h"
 #include "ozone/gl_surface_glx_qt.h"
+#include "ui/gfx/x/xlib.h"
 #include "ui/gl/gl_bindings.h"
 #include "ui/gl/gl_surface_glx.h"
-#include "ui/gfx/x/x11_types.h"
 
 namespace gl {
 

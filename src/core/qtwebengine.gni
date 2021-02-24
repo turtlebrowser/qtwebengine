@@ -57,7 +57,7 @@ if (use_ozone) {
   deps += [ "$_ozone_extra_directory:qt" ]
 }
 
-if (use_xscrnsaver) {
+if (is_linux) {
   deps += [ "//ui/base/x" ]
 }
 

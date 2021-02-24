@@ -54,6 +54,10 @@ class Display;
 class SyntheticBeginFrameSource;
 } // namespace viz
 
+namespace gpu {
+class MemoryTracker;
+} // namespace gpu
+
 namespace QtWebEngineCore {
 
 // NOTE: Some methods are defined in display_gl_output_surface_qsg.cpp due
@@ -85,8 +89,6 @@ public:
     void SetUpdateVSyncParametersCallback(viz::UpdateVSyncParametersCallback callback) override;
     void SetDisplayTransformHint(gfx::OverlayTransform transform) override;
     gfx::OverlayTransform GetDisplayTransform() override;
-    scoped_refptr<gpu::GpuTaskSchedulerHelper> GetGpuTaskSchedulerHelper() override;
-    gpu::MemoryTracker *GetMemoryTracker() override;
 
     // Overridden from DisplayProducer.
     QSGNode *updatePaintNode(QSGNode *oldNode, RenderWidgetHostViewQtDelegate *delegate) override;

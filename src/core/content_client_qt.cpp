@@ -162,36 +162,6 @@ static QString ppapiPluginsPath()
 content::PepperPluginInfo CreatePepperFlashInfo(const base::FilePath& path, const std::string& version)
 {
     content::PepperPluginInfo plugin;
-
-    plugin.is_out_of_process = true;
-    plugin.name = content::kFlashPluginName;
-    plugin.path = path;
-    plugin.permissions = kPepperFlashPermissions;
-
-    std::vector<std::string> flash_version_numbers = base::SplitString(version, ".", base::TRIM_WHITESPACE, base::SPLIT_WANT_NONEMPTY);
-    if (flash_version_numbers.size() < 1)
-        flash_version_numbers.push_back("11");
-    else if (flash_version_numbers[0].empty())
-        flash_version_numbers[0] = "11";
-    if (flash_version_numbers.size() < 2)
-        flash_version_numbers.push_back("2");
-    if (flash_version_numbers.size() < 3)
-        flash_version_numbers.push_back("999");
-    if (flash_version_numbers.size() < 4)
-        flash_version_numbers.push_back("999");
-
-    // E.g., "Shockwave Flash 10.2 r154":
-    plugin.description = plugin.name + " " + flash_version_numbers[0] + "." + flash_version_numbers[1] + " r" + flash_version_numbers[2];
-    plugin.version = base::JoinString(flash_version_numbers, ".");
-    content::WebPluginMimeType swf_mime_type(content::kFlashPluginSwfMimeType,
-                                             content::kFlashPluginSwfExtension,
-                                             content::kFlashPluginSwfDescription);
-    plugin.mime_types.push_back(swf_mime_type);
-    content::WebPluginMimeType spl_mime_type(content::kFlashPluginSplMimeType,
-                                             content::kFlashPluginSplExtension,
-                                             content::kFlashPluginSplDescription);
-    plugin.mime_types.push_back(spl_mime_type);
-
     return plugin;
 }
 
