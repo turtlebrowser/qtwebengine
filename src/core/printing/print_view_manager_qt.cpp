@@ -288,20 +288,24 @@ PrintViewManagerQt::PrintViewManagerQt(content::WebContents *contents)
 bool PrintViewManagerQt::OnMessageReceived(const IPC::Message& message,
                                            content::RenderFrameHost* render_frame_host)
 {
+#if FIX_PRINTING
     FrameDispatchHelper helper = {this, render_frame_host};
     bool handled = true;
     IPC_BEGIN_MESSAGE_MAP_WITH_PARAM(PrintViewManagerQt, message, render_frame_host);
-        IPC_MESSAGE_HANDLER(PrintHostMsg_RequestPrintPreview, OnRequestPrintPreview)
+        // IPC_MESSAGE_HANDLER(PrintHostMsg_RequestPrintPreview, OnRequestPrintPreview)
         IPC_MESSAGE_HANDLER(PrintHostMsg_MetafileReadyForPrinting, OnMetafileReadyForPrinting);
         IPC_MESSAGE_HANDLER(PrintHostMsg_DidPreviewPage, OnDidPreviewPage)
         IPC_MESSAGE_FORWARD_DELAY_REPLY(
                 PrintHostMsg_SetupScriptedPrintPreview, &helper,
                 FrameDispatchHelper::OnSetupScriptedPrintPreview)
-        IPC_MESSAGE_HANDLER(PrintHostMsg_ShowScriptedPrintPreview,
-                                       OnShowScriptedPrintPreview)
+        // IPC_MESSAGE_HANDLER(PrintHostMsg_ShowScriptedPrintPreview,
+        //                                OnShowScriptedPrintPreview)
         IPC_MESSAGE_UNHANDLED(handled = false)
     IPC_END_MESSAGE_MAP()
     return handled || PrintViewManagerBaseQt::OnMessageReceived(message, render_frame_host);
+#else
+    return false;
+#endif // FIX_PRINTING
 }
 
 void PrintViewManagerQt::RenderFrameDeleted(content::RenderFrameHost *render_frame_host)
@@ -339,6 +343,7 @@ void PrintViewManagerQt::resetPdfState()
 
 // IPC handlers
 
+#if FIX_PRINTING
 void PrintViewManagerQt::OnRequestPrintPreview(
     const PrintHostMsg_RequestPrintPreview_Params & /*params*/)
 {
@@ -347,6 +352,7 @@ void PrintViewManagerQt::OnRequestPrintPreview(
     printRenderFrame->PrintPreview(m_printSettings->Clone());
     PrintPreviewDone();
 }
+#endif // FIX_PRINTING
 
 void PrintViewManagerQt::OnMetafileReadyForPrinting(content::RenderFrameHost* rfh,
                                                     const printing::mojom::DidPreviewDocumentParams& params,
@@ -424,11 +430,13 @@ void PrintViewManagerQt::OnSetupScriptedPrintPreview(content::RenderFrameHost* r
     client->printRequested();
 }
 
+#if FIX_PRINTING
 void PrintViewManagerQt::OnShowScriptedPrintPreview(content::RenderFrameHost* rfh,
                                                     bool source_is_modifiable)
 {
     // ignore for now
 }
+#endif
 
 void PrintViewManagerQt::PrintPreviewDone() {
     GetPrintRenderFrame(m_printPreviewRfh)->OnPrintPreviewDialogClosed();

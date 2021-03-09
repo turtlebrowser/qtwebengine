@@ -63,7 +63,7 @@
 #include "components/discardable_memory/service/discardable_shared_memory_manager.h"
 #include "components/viz/common/features.h"
 #include "components/web_cache/browser/web_cache_manager.h"
-#include "content/app/service_manager_environment.h"
+#include "content/app/mojo_ipc_support.h"
 #include "content/browser/devtools/devtools_http_handler.h"
 #include "content/browser/scheduler/browser_task_executor.h"
 #include "content/browser/startup_data_impl.h"
@@ -404,7 +404,7 @@ void WebEngineContext::destroy()
 
     // These would normally be in the content-runner, but we allocated them separately:
     m_startupData.reset();
-    m_serviceManagerEnvironment.reset();
+    m_mojo_ipc_support.reset();
     m_discardableSharedMemoryManager.reset();
 
     // Destroying content-runner will force Chromium at_exit calls to run, and
@@ -748,7 +748,7 @@ WebEngineContext::WebEngineContext()
         parsedCommandLine->AppendSwitch(switches::kInProcessGPU);
         if (enableGLSoftwareRendering) {
             parsedCommandLine->AppendSwitch(switches::kDisableGpuRasterization);
-            parsedCommandLine->AppendSwitch(switches::kIgnoreGpuBlacklist);
+            parsedCommandLine->AppendSwitch(switches::kIgnoreGpuBlocklist);
         }
     } else {
         parsedCommandLine->AppendSwitch(switches::kDisableGpu);
@@ -781,8 +781,8 @@ WebEngineContext::WebEngineContext()
     tracing::InitTracingPostThreadPoolStartAndFeatureList();
     m_discardableSharedMemoryManager = std::make_unique<discardable_memory::DiscardableSharedMemoryManager>();
     base::PowerMonitor::Initialize(std::make_unique<base::PowerMonitorDeviceSource>());
-    m_serviceManagerEnvironment = std::make_unique<content::ServiceManagerEnvironment>(content::BrowserTaskExecutor::CreateIOThread());
-    m_startupData = m_serviceManagerEnvironment->CreateBrowserStartupData();
+    m_mojo_ipc_support = std::make_unique<content::MojoIpcSupport>(content::BrowserTaskExecutor::CreateIOThread());
+    m_startupData = m_mojo_ipc_support->CreateBrowserStartupData();
 
     // Once the MessageLoop has been created, attach a top-level RunLoop.
     m_runLoop.reset(new base::RunLoop);

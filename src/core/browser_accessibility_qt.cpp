@@ -218,7 +218,6 @@ QAccessible::Role BrowserAccessibilityQt::role() const
 
     // Used by Chromium to distinguish between the root of the tree
     // for this page, and a web area for a frame within this page.
-    case ax::mojom::Role::kWebArea:
     case ax::mojom::Role::kWebView:
     case ax::mojom::Role::kRootWebArea: // not sure if we need to make a diff here, but this seems common
         return QAccessible::WebDocument;
@@ -488,7 +487,6 @@ QAccessible::Role BrowserAccessibilityQt::role() const
     case ax::mojom::Role::kSection:
         return QAccessible::Section;
     case ax::mojom::Role::kSlider:
-    case ax::mojom::Role::kSliderThumb:
         return QAccessible::Slider;
     case ax::mojom::Role::kSpinButton:
         return QAccessible::SpinBox;

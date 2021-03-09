@@ -127,8 +127,8 @@ bool ExtensionsRendererClientQt::ExtensionAPIEnabledForServiceWorkerScript(const
     if (!script_url.SchemeIs(extensions::kExtensionScheme))
         return false;
 
-    if (!extensions::ExtensionsClient::Get()->ExtensionAPIEnabledInExtensionServiceWorkers())
-        return false;
+    // if (!extensions::ExtensionsClient::Get()->ExtensionAPIEnabledInExtensionServiceWorkers())
+    //     return false;
 
     const extensions::Extension* extension =
             extensions::RendererExtensionRegistry::Get()->GetExtensionOrAppByURL(script_url);
@@ -186,7 +186,7 @@ void ExtensionsRendererClientQt::WillSendRequest(blink::WebLocalFrame *frame,
                                                  bool *attach_same_site_cookies)
 {
     if (url.ProtocolIs(extensions::kExtensionScheme) &&
-            !resource_request_policy_->CanRequestResource(url, frame, transition_type)) {
+            !resource_request_policy_->CanRequestResource(url, frame, transition_type, base::OptionalFromPtr(initiator_origin))) {
         *new_url = GURL(chrome::kExtensionInvalidRequestURL);
     }
 }

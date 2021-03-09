@@ -588,12 +588,11 @@ void ContentRendererClientQt::WillSendRequest(blink::WebLocalFrame *frame,
                                               const blink::WebURL &url,
                                               const net::SiteForCookies &site_for_cookies,
                                               const url::Origin *initiator_origin,
-                                              GURL *new_url,
-                                              bool *attach_same_site_cookies)
+                                              GURL *new_url)
 {
 #if BUILDFLAG(ENABLE_EXTENSIONS)
-    ExtensionsRendererClientQt::GetInstance()->WillSendRequest(frame, transition_type, url, /*site_for_cookies,*/
-                                                               initiator_origin, new_url, attach_same_site_cookies);
+    ExtensionsRendererClientQt::GetInstance()->WillSendRequest(frame, transition_type, url,
+                                                               initiator_origin, new_url);
     if (!new_url->is_empty())
         return;
 #endif

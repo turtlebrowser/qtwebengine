@@ -75,8 +75,8 @@ public:
     bool IsGuestSession(content::BrowserContext *context) const override;
     bool IsExtensionIncognitoEnabled(const std::string &extension_id, content::BrowserContext *context) const override;
     bool CanExtensionCrossIncognito(const Extension *extension, content::BrowserContext *context) const override;
-    bool AllowCrossRendererResourceLoad(const GURL &url,
-                                        blink::mojom::ResourceType resource_type,
+    bool AllowCrossRendererResourceLoad(const network::ResourceRequest& request,
+                                        network::mojom::RequestDestination destination,
                                         ui::PageTransition page_transition,
                                         int child_id,
                                         bool is_incognito,

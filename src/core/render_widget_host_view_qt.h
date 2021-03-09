@@ -122,7 +122,7 @@ public:
 
     void InitAsChild(gfx::NativeView) override;
     void InitAsPopup(content::RenderWidgetHostView*, const gfx::Rect&) override;
-    void InitAsFullscreen(content::RenderWidgetHostView*) override;
+    // void InitAsFullscreen(content::RenderWidgetHostView*) override;
     void SetSize(const gfx::Size& size) override;
     void SetBounds(const gfx::Rect&) override;
     gfx::NativeView GetNativeView() override;
@@ -219,7 +219,7 @@ public:
 #endif // defined(OS_MAC)
 
     // Overridden from content::BrowserAccessibilityDelegate
-    content::BrowserAccessibilityManager* CreateBrowserAccessibilityManager(content::BrowserAccessibilityDelegate* delegate, bool for_root_frame) override;
+    // content::BrowserAccessibilityManager* CreateBrowserAccessibilityManager(content::BrowserAccessibilityDelegate* delegate, bool for_root_frame) override;
 
     // Called from WebContentsDelegateQt
     void OnDidFirstVisuallyNonEmptyPaint();

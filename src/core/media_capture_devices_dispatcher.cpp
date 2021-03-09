@@ -61,6 +61,7 @@
 #include "content/public/browser/render_process_host.h"
 #include "media/audio/audio_device_description.h"
 #include "media/audio/audio_manager_base.h"
+#include "services/network/public/cpp/is_potentially_trustworthy.h"
 #include "third_party/blink/public/common/loader/network_utils.h"
 #include "ui/base/l10n/l10n_util.h"
 
@@ -351,7 +352,7 @@ void MediaCaptureDevicesDispatcher::processMediaAccessRequest(WebContentsAdapter
     if (flags.testFlag(WebContentsAdapterClient::MediaDesktopVideoCapture)) {
         const bool screenCaptureEnabled =
                 adapterClient->webEngineSettings()->testAttribute(WebEngineSettings::ScreenCaptureEnabled);
-        const bool originIsSecure = blink::network_utils::IsOriginSecure(request.security_origin);
+        const bool originIsSecure = network::IsUrlPotentiallyTrustworthy(request.security_origin);
         if (!screenCaptureEnabled || !originIsSecure) {
             std::move(callback).Run(blink::MediaStreamDevices(), MediaStreamRequestResult::INVALID_STATE, std::unique_ptr<content::MediaStreamUI>());
             return;

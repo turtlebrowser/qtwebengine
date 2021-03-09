@@ -72,6 +72,7 @@ void PrintingMessageFilterQt::OnDestruct() const
 }
 
 bool PrintingMessageFilterQt::OnMessageReceived(const IPC::Message& message) {
+#if FIX_PRINTING
   bool handled = true;
   IPC_BEGIN_MESSAGE_MAP(PrintingMessageFilterQt, message)
     IPC_MESSAGE_HANDLER_DELAY_REPLY(PrintHostMsg_ScriptedPrint, OnScriptedPrint)
@@ -79,6 +80,9 @@ bool PrintingMessageFilterQt::OnMessageReceived(const IPC::Message& message) {
     IPC_MESSAGE_UNHANDLED(handled = false)
   IPC_END_MESSAGE_MAP()
   return handled;
+#else
+  return false;
+#endif
 }
 
 void PrintingMessageFilterQt::OnScriptedPrint(
@@ -106,6 +110,7 @@ void PrintingMessageFilterQt::OnScriptedPrint(
 void PrintingMessageFilterQt::OnScriptedPrintReply(
     std::unique_ptr<printing::PrinterQuery> printer_query,
     IPC::Message* reply_msg) {
+#if FIX_PRINTING
   printing::mojom::PrintPagesParams params;
   params.params = printing::mojom::PrintParams::New();
   if (printer_query->last_status() != printing::PrintingContext::OK ||
@@ -123,6 +128,7 @@ void PrintingMessageFilterQt::OnScriptedPrintReply(
   } else {
     printer_query->StopWorker();
   }
+#endif
 }
 
 void PrintingMessageFilterQt::OnCheckForCancel(const printing::mojom::PreviewIds& ids,

@@ -101,7 +101,7 @@ public:
                          const blink::WebURL &url,
                          const url::Origin *initiator_origin,
                          GURL *new_url,
-                         bool *attach_same_site_cookies);
+                         bool *attach_same_site_cookies = nullptr);
 
     static bool ShouldFork(blink::WebLocalFrame *frame,
                            const GURL &url,
