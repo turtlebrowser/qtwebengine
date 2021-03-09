@@ -45,6 +45,7 @@
 #include "base/strings/utf_string_conversions.h"
 #include "base/task/post_task.h"
 #include "base/threading/thread_restrictions.h"
+#include "chromecast/browser/service_manager_connection.h"
 #include "chrome/browser/custom_handlers/protocol_handler_registry.h"
 #include "chrome/browser/custom_handlers/protocol_handler_registry_factory.h"
 #if QT_CONFIG(webengine_spellchecker)
@@ -77,8 +78,7 @@
 #include "content/public/browser/web_ui_url_loader_factory.h"
 #include "content/public/common/content_switches.h"
 #include "content/public/common/main_function_params.h"
-#include "content/public/common/service_manager_connection.h"
-#include "content/public/common/service_names.mojom.h"
+// #include "content/public/common/service_names.mojom.h"
 #include "content/public/common/url_constants.h"
 #include "content/public/common/user_agent.h"
 #include "media/media_buildflags.h"
@@ -637,31 +637,31 @@ void ContentBrowserClientQt::ExposeInterfacesToRenderer(service_manager::BinderR
     performance_manager::PerformanceManagerRegistry::GetInstance()->CreateProcessNodeAndExposeInterfacesToRendererProcess(registry, render_process_host);
 }
 
-void ContentBrowserClientQt::RunServiceInstance(const service_manager::Identity &identity,
-                                                mojo::PendingReceiver<service_manager::mojom::Service> *receiver)
-{
-#if BUILDFLAG(ENABLE_MOJO_MEDIA_IN_BROWSER_PROCESS)
-    if (identity.name() == media::mojom::kMediaServiceName) {
-        service_manager::Service::RunAsyncUntilTermination(media::CreateMediaService(std::move(*receiver)));
-        return;
-    }
-#endif
+// void ContentBrowserClientQt::RunServiceInstance(const service_manager::Identity &identity,
+//                                                 mojo::PendingReceiver<service_manager::mojom::Service> *receiver)
+// {
+// #if BUILDFLAG(ENABLE_MOJO_MEDIA_IN_BROWSER_PROCESS)
+//     if (identity.name() == media::mojom::kMediaServiceName) {
+//         service_manager::Service::RunAsyncUntilTermination(media::CreateMediaService(std::move(*receiver)));
+//         return;
+//     }
+// #endif
 
-    content::ContentBrowserClient::RunServiceInstance(identity, receiver);
-}
+//     content::ContentBrowserClient::RunServiceInstance(identity, receiver);
+// }
 
-base::Optional<service_manager::Manifest> ContentBrowserClientQt::GetServiceManifestOverlay(base::StringPiece name)
-{
-    if (name == content::mojom::kBrowserServiceName)
-        return GetQtWebEngineContentBrowserOverlayManifest();
+// base::Optional<service_manager::Manifest> ContentBrowserClientQt::GetServiceManifestOverlay(base::StringPiece name)
+// {
+//     if (name == content::mojom::kBrowserServiceName)
+//         return GetQtWebEngineContentBrowserOverlayManifest();
 
-    return base::nullopt;
-}
+//     return base::nullopt;
+// }
 
-std::vector<service_manager::Manifest> ContentBrowserClientQt::GetExtraServiceManifests()
-{
-    return { };
-}
+// std::vector<service_manager::Manifest> ContentBrowserClientQt::GetExtraServiceManifests()
+// {
+//     return { };
+// }
 
 bool ContentBrowserClientQt::CanCreateWindow(
         content::RenderFrameHost* opener,
@@ -722,8 +722,7 @@ bool ContentBrowserClientQt::ShouldEnableStrictSiteIsolation()
 bool ContentBrowserClientQt::WillCreateRestrictedCookieManager(network::mojom::RestrictedCookieManagerRole role,
         content::BrowserContext *browser_context,
         const url::Origin & /*origin*/,
-        const net::SiteForCookies & /*site_for_cookies*/,
-        const url::Origin & /*top_frame_origin*/,
+        const net::IsolationInfo& /*isolation_info*/,
         bool is_service_worker,
         int process_id,
         int routing_id,

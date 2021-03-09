@@ -69,7 +69,7 @@ static ProfileAdapter::PermissionType toQt(content::PermissionType type)
         return ProfileAdapter::NotificationPermission;
     case content::PermissionType::ACCESSIBILITY_EVENTS:
         return ProfileAdapter::UnsupportedPermission;
-    case content::PermissionType::FLASH:
+    // case content::PermissionType::FLASH:
     case content::PermissionType::MIDI_SYSEX:
     case content::PermissionType::PROTECTED_MEDIA_IDENTIFIER:
     case content::PermissionType::MIDI:

@@ -65,8 +65,7 @@ bool MimeHandlerViewGuestDelegateQt::HandleContextMenu(content::WebContents *web
 {
     content::ContextMenuParams new_params = params;
 
-    gfx::Point guest_coordinates =
-            static_cast<content::WebContentsImpl *>(web_contents)->GetBrowserPluginGuest()->GetScreenCoordinates(gfx::Point());
+    gfx::Point guest_coordinates = gfx::Point();
 
     // Adjust (x,y) position for offset from guest to embedder.
     new_params.x += guest_coordinates.x();

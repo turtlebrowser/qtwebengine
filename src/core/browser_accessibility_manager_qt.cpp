@@ -46,6 +46,23 @@ using namespace blink;
 
 namespace content {
 
+// // static
+// ui::AXTreeUpdate BrowserAccessibilityManager::GetEmptyDocument() {
+//   ui::AXNodeData empty_document;
+//   empty_document.id = 1;
+//   empty_document.role = ax::mojom::Role::kRootWebArea;
+//   ui::AXTreeUpdate update;
+//   update.root_id = empty_document.id;
+//   update.nodes.push_back(empty_document);
+//   return update;
+// }
+
+// static
+BrowserAccessibilityManager* BrowserAccessibilityManager::Create(
+    BrowserAccessibilityDelegate* delegate) {
+  return new BrowserAccessibilityManagerQt(nullptr, BrowserAccessibilityManager::GetEmptyDocument(), delegate);
+}
+
 BrowserAccessibilityManager* BrowserAccessibilityManager::Create(
       const ui::AXTreeUpdate& initialTree,
       BrowserAccessibilityDelegate* delegate)

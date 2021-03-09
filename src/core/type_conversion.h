@@ -117,7 +117,7 @@ inline base::string16 toString16(const QString &qString)
 #if defined(OS_WIN)
     return base::string16(qString.toStdWString());
 #else
-    return base::string16(qString.utf16());
+    return base::string16(qString.toStdU16String());
 #endif
 }
 

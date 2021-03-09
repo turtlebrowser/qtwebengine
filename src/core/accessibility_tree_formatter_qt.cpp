@@ -37,7 +37,7 @@
 **
 ****************************************************************************/
 
-#include "content/browser/accessibility/accessibility_tree_formatter_base.h"
+#include "ui/accessibility/platform/inspect/ax_tree_formatter_base.h"
 
 #include <utility>
 
@@ -47,6 +47,7 @@
 #include "base/strings/stringprintf.h"
 #include "base/strings/utf_string_conversions.h"
 #include "base/values.h"
+#include "content/public/browser/ax_inspect_factory.h"
 
 #include "browser_accessibility_qt.h"
 #include "api/qtwebenginecoreglobal_p.h"
@@ -54,19 +55,20 @@
 namespace content {
 
 #if QT_CONFIG(accessibility)
-class AccessibilityTreeFormatterQt : public AccessibilityTreeFormatterBase {
+class AccessibilityTreeFormatterQt : public ui::AXTreeFormatterBase {
 public:
     explicit AccessibilityTreeFormatterQt();
     ~AccessibilityTreeFormatterQt() override;
 
-    base::Value BuildTreeForSelector(const AXTreeSelector&) const override { return {}; }
+    base::Value BuildTreeForSelector(const ui::AXTreeSelector&) const override { return {}; }
     base::Value BuildTreeForWindow(gfx::AcceleratedWidget widget) const override { return {}; }
-    std::unique_ptr<base::DictionaryValue> BuildAccessibilityTree(content::BrowserAccessibility *) override;
+    base::Value BuildTree(ui::AXPlatformNodeDelegate* root) const override { return {}; }
+    std::unique_ptr<base::DictionaryValue> BuildAccessibilityTree(content::BrowserAccessibility *);
 
 private:
     void RecursiveBuildAccessibilityTree(const content::BrowserAccessibility &node, base::DictionaryValue *dict) const;
     void AddProperties(const BrowserAccessibility &node, base::DictionaryValue *dict) const;
-    std::string ProcessTreeForOutput(const base::DictionaryValue &node, base::DictionaryValue * = nullptr) override;
+    std::string ProcessTreeForOutput(const base::DictionaryValue &node) const override;
 };
 
 AccessibilityTreeFormatterQt::AccessibilityTreeFormatterQt()
@@ -166,7 +168,7 @@ void AccessibilityTreeFormatterQt::AddProperties(const BrowserAccessibility &nod
     dict->SetString("description", acc_node->text(QAccessible::Description).toStdString());
 }
 
-std::string AccessibilityTreeFormatterQt::ProcessTreeForOutput(const base::DictionaryValue &node, base::DictionaryValue *)
+std::string AccessibilityTreeFormatterQt::ProcessTreeForOutput(const base::DictionaryValue &node) const
 {
     std::string error_value;
     if (node.GetString("error", &error_value))
@@ -206,7 +208,13 @@ std::string AccessibilityTreeFormatterQt::ProcessTreeForOutput(const base::Dicti
 #endif // QT_CONFIG(accessibility)
 
 // static
-std::unique_ptr<ui::AXTreeFormatter> AccessibilityTreeFormatter::Create()
+std::unique_ptr<ui::AXTreeFormatter> AXInspectFactory::CreatePlatformFormatter() {
+    // Type doesn't matter
+    return CreateFormatter(kBlink);
+}
+
+// static
+std::unique_ptr<ui::AXTreeFormatter> AXInspectFactory::CreateFormatter(AXInspectFactory::Type type)
 {
 #if QT_CONFIG(accessibility)
     return std::unique_ptr<ui::AXTreeFormatter>(new AccessibilityTreeFormatterQt());

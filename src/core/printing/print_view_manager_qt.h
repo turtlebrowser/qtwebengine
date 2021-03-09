@@ -99,7 +99,9 @@ protected:
     void RenderFrameDeleted(content::RenderFrameHost* render_frame_host) override;
 
     // IPC handlers
+#if FIX_PRINTING
     void OnRequestPrintPreview(const PrintHostMsg_RequestPrintPreview_Params&);
+#endif
     void OnMetafileReadyForPrinting(content::RenderFrameHost* rfh,
                                     const printing::mojom::DidPreviewDocumentParams& params,
                                     const printing::mojom::PreviewIds &ids);
@@ -108,9 +110,12 @@ protected:
     void OnDidPreviewPage(content::RenderFrameHost* rfh,
                           const printing::mojom::DidPreviewPageParams& params,
                           const printing::mojom::PreviewIds& ids);
+#if FIX_PRINTING
     void OnShowScriptedPrintPreview(content::RenderFrameHost* rfh,
                                     bool source_is_modifiable);
+#endif
     bool PrintToPDFInternal(const QPageLayout &, bool printInColor, bool useCustomMargins = true);
+    void ScriptedPrint(printing::mojom::ScriptedPrintParamsPtr params, ScriptedPrintCallback callback) override {}
 
 private:
     void resetPdfState();

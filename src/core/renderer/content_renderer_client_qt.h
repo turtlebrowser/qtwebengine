@@ -123,8 +123,7 @@ public:
                          const blink::WebURL &url,
                          const net::SiteForCookies &site_for_cookies,
                          const url::Origin *initiator_origin,
-                         GURL *new_url,
-                         bool *attach_same_site_cookies) override;
+                         GURL *new_url) override;
 
     bool RequiresHtmlImports(const GURL &url) override;
 

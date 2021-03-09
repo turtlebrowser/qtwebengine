@@ -25,7 +25,7 @@ qtConfig(webengine-embedded-build) {
     qtConfig(webengine-ozone-x11) {
         gn_args += ozone_platform_x11=true
         gn_args += use_xkbcommon=true
-        packagesExist(xscrnsaver): gn_args += use_xscrnsaver=true
+#        packagesExist(xscrnsaver): gn_args += use_xscrnsaver=true
         qtConfig(webengine-webrtc): gn_args += rtc_use_x11=true
     }
 

@@ -413,9 +413,9 @@ void RenderWidgetHostViewQt::InitAsPopup(content::RenderWidgetHostView*, const g
     m_delegate->initAsPopup(toQt(rect));
 }
 
-void RenderWidgetHostViewQt::InitAsFullscreen(content::RenderWidgetHostView*)
-{
-}
+// void RenderWidgetHostViewQt::InitAsFullscreen(content::RenderWidgetHostView*)
+// {
+// }
 
 void RenderWidgetHostViewQt::SetSize(const gfx::Size &sizeInDips)
 {
@@ -445,18 +445,18 @@ gfx::NativeViewAccessible RenderWidgetHostViewQt::GetNativeViewAccessible()
     return 0;
 }
 
-content::BrowserAccessibilityManager* RenderWidgetHostViewQt::CreateBrowserAccessibilityManager(content::BrowserAccessibilityDelegate* delegate, bool for_root_frame)
-{
-    Q_UNUSED(for_root_frame); // FIXME
-#if QT_CONFIG(accessibility)
-    return new content::BrowserAccessibilityManagerQt(
-        m_adapterClient->accessibilityParentObject(),
-        content::BrowserAccessibilityManagerQt::GetEmptyDocument(),
-        delegate);
-#else
-    return 0;
-#endif // QT_CONFIG(accessibility)
-}
+// content::BrowserAccessibilityManager* RenderWidgetHostViewQt::CreateBrowserAccessibilityManager(content::BrowserAccessibilityDelegate* delegate, bool for_root_frame)
+// {
+//     Q_UNUSED(for_root_frame); // FIXME
+// #if QT_CONFIG(accessibility)
+//     return new content::BrowserAccessibilityManagerQt(
+//         m_adapterClient->accessibilityParentObject(),
+//         content::BrowserAccessibilityManagerQt::GetEmptyDocument(),
+//         delegate);
+// #else
+//     return 0;
+// #endif // QT_CONFIG(accessibility)
+// }
 
 // Set focus to the associated View component.
 void RenderWidgetHostViewQt::Focus()

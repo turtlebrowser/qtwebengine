@@ -115,7 +115,7 @@ void PrefServiceAdapter::setup(const ProfileAdapter &profileAdapter)
     registry->RegisterListPref(extensions::pref_names::kInstallAllowList);
     registry->RegisterListPref(extensions::pref_names::kInstallDenyList);
     registry->RegisterDictionaryPref(extensions::pref_names::kInstallForceList);
-    registry->RegisterDictionaryPref(extensions::pref_names::kLoginScreenExtensions);
+    // registry->RegisterDictionaryPref(extensions::pref_names::kLoginScreenExtensions);
     registry->RegisterListPref(extensions::pref_names::kAllowedTypes);
     registry->RegisterBooleanPref(extensions::pref_names::kStorageGarbageCollect, false);
     registry->RegisterListPref(extensions::pref_names::kAllowedInstallSites);

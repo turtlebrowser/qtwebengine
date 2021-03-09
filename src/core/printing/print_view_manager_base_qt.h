@@ -118,13 +118,14 @@ private:
     void DidStartLoading() override;
 
     // printing::PrintManager:
+#if FIX_PRINTING
     void OnDidPrintDocument(
-        content::RenderFrameHost *render_frame_host,
-        const printing::mojom::DidPrintDocumentParams &params,
-        std::unique_ptr<DelayedFrameDispatchHelper> helper) override;
+        printing::mojom::DidPrintDocumentParamsPtr params,
+        DidPrintDocumentCallback callback) override;
     void OnScriptedPrint(content::RenderFrameHost *render_frame_host,
                          const printing::mojom::ScriptedPrintParams &params,
                          IPC::Message *reply_msg) override;
+#endif
 
     // Processes a NOTIFY_PRINT_JOB_EVENT notification.
     void OnNotifyPrintJobEvent(const printing::JobEventDetails &event_details);

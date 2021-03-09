@@ -95,6 +95,7 @@
 #include "ui/base/clipboard/clipboard.h"
 #include "ui/base/clipboard/clipboard_constants.h"
 #include "ui/base/clipboard/custom_data_helper.h"
+#include "ui/base/dragdrop/mojom/drag_drop_types.mojom-forward.h"
 #include "ui/gfx/font_render_params.h"
 #include "qtwebengine/browser/qtwebenginepage.mojom.h"
 
@@ -426,7 +427,7 @@ QSharedPointer<WebContentsAdapter> WebContentsAdapter::createFromSerializedNavig
     // Unlike WebCore, Chromium only supports Restoring to a new WebContents instance.
     std::unique_ptr<content::WebContents> newWebContents = createBlankWebContents(adapterClient, adapterClient->profileAdapter()->profile());
     content::NavigationController &controller = newWebContents->GetController();
-    controller.Restore(currentIndex, content::RestoreType::LAST_SESSION_EXITED_CLEANLY, &entries);
+    controller.Restore(currentIndex, content::RestoreType::kRestored, &entries);
 
     if (controller.GetActiveEntry()) {
         // Set up the file access rights for the selected navigation entry.
@@ -1531,7 +1532,7 @@ void WebContentsAdapter::startDragging(QObject *dragSource, const content::DropD
             if (rvh) {
                 rvh->GetWidget()->DragSourceEndedAt(gfx::PointF(m_lastDragClientPos.x(), m_lastDragClientPos.y()),
                                                     gfx::PointF(m_lastDragScreenPos.x(), m_lastDragScreenPos.y()),
-                                                    blink::DragOperation(m_currentDropAction));
+                                                    ui::mojom::DragOperation(m_currentDropAction));
                 rvh->GetWidget()->DragSourceSystemDragEnded();
             }
         }
@@ -1592,13 +1593,14 @@ static void fillDropDataFromMimeData(content::DropData *dropData, const QMimeDat
     }
 }
 
-Qt::DropAction toQt(blink::DragOperation op)
+Qt::DropAction toQt(ui::mojom::DragOperation drag_operation)
 {
+    blink::DragOperationsMask op = blink::DragOperationsMask(int(drag_operation));
     if (op & blink::kDragOperationCopy)
         return Qt::CopyAction;
     if (op & blink::kDragOperationLink)
         return Qt::LinkAction;
-    if (op & blink::kDragOperationMove || op & blink::kDragOperationDelete)
+    if (op & blink::kDragOperationMove)
         return Qt::MoveAction;
     return Qt::IgnoreAction;
 }
@@ -1655,7 +1657,7 @@ Qt::DropAction WebContentsAdapter::updateDragPosition(QDragMoveEvent *e, const Q
     rvh->GetWidget()->DragTargetDragOver(toGfx(m_lastDragClientPos), toGfx(m_lastDragScreenPos), toWeb(e->possibleActions()),
                                          toWeb(e->mouseButtons()) | toWeb(e->keyboardModifiers()));
     waitForUpdateDragActionCalled();
-    return toQt(blink::DragOperation(m_currentDropAction));
+    return toQt(ui::mojom::DragOperation(m_currentDropAction));
 }
 
 void WebContentsAdapter::waitForUpdateDragActionCalled()
@@ -1688,7 +1690,7 @@ void WebContentsAdapter::updateDragAction(int action)
 {
     CHECK_INITIALIZED();
     m_updateDragActionCalled = true;
-    m_currentDropAction = static_cast<blink::DragOperation>(action);
+    m_currentDropAction = action;
 }
 
 void WebContentsAdapter::endDragging(QDropEvent *e, const QPointF &screenPos)

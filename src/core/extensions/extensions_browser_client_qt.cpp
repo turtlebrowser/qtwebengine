@@ -361,8 +361,8 @@ void ExtensionsBrowserClientQt::LoadResourceFromResourceBundle(const network::Re
 }
 
 
-bool ExtensionsBrowserClientQt::AllowCrossRendererResourceLoad(const GURL &url,
-                                                               blink::mojom::ResourceType resource_type,
+bool ExtensionsBrowserClientQt::AllowCrossRendererResourceLoad(const network::ResourceRequest& request,
+                                                               network::mojom::RequestDestination destination,
                                                                ui::PageTransition page_transition,
                                                                int child_id,
                                                                bool is_incognito,
@@ -375,7 +375,7 @@ bool ExtensionsBrowserClientQt::AllowCrossRendererResourceLoad(const GURL &url,
         return true;
 
     bool allowed = false;
-    if (url_request_util::AllowCrossRendererResourceLoad(url, resource_type,
+    if (url_request_util::AllowCrossRendererResourceLoad(request, destination,
                                                          page_transition, child_id,
                                                          is_incognito, extension, extensions,
                                                          process_map, &allowed)) {

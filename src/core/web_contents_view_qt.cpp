@@ -60,7 +60,6 @@
 #include "content/public/browser/context_menu_params.h"
 #include "content/public/browser/web_contents_delegate.h"
 #include "third_party/blink/public/common/context_menu_data/edit_flags.h"
-#include "third_party/blink/public/common/context_menu_data/media_type.h"
 #include "ui/gfx/image/image_skia.h"
 
 #include <QtGui/qpixmap.h>
@@ -164,13 +163,13 @@ void WebContentsViewQt::FocusThroughTabTraversal(bool reverse)
 }
 
 
-ASSERT_ENUMS_MATCH(WebEngineContextMenuData::MediaTypeNone, blink::ContextMenuDataMediaType::kNone)
-ASSERT_ENUMS_MATCH(WebEngineContextMenuData::MediaTypeImage, blink::ContextMenuDataMediaType::kImage)
-ASSERT_ENUMS_MATCH(WebEngineContextMenuData::MediaTypeVideo, blink::ContextMenuDataMediaType::kVideo)
-ASSERT_ENUMS_MATCH(WebEngineContextMenuData::MediaTypeAudio, blink::ContextMenuDataMediaType::kAudio)
-ASSERT_ENUMS_MATCH(WebEngineContextMenuData::MediaTypeCanvas, blink::ContextMenuDataMediaType::kCanvas)
-ASSERT_ENUMS_MATCH(WebEngineContextMenuData::MediaTypeFile, blink::ContextMenuDataMediaType::kFile)
-ASSERT_ENUMS_MATCH(WebEngineContextMenuData::MediaTypePlugin, blink::ContextMenuDataMediaType::kPlugin)
+ASSERT_ENUMS_MATCH(WebEngineContextMenuData::MediaTypeNone, blink::mojom::ContextMenuDataMediaType::kNone)
+ASSERT_ENUMS_MATCH(WebEngineContextMenuData::MediaTypeImage, blink::mojom::ContextMenuDataMediaType::kImage)
+ASSERT_ENUMS_MATCH(WebEngineContextMenuData::MediaTypeVideo, blink::mojom::ContextMenuDataMediaType::kVideo)
+ASSERT_ENUMS_MATCH(WebEngineContextMenuData::MediaTypeAudio, blink::mojom::ContextMenuDataMediaType::kAudio)
+ASSERT_ENUMS_MATCH(WebEngineContextMenuData::MediaTypeCanvas, blink::mojom::ContextMenuDataMediaType::kCanvas)
+ASSERT_ENUMS_MATCH(WebEngineContextMenuData::MediaTypeFile, blink::mojom::ContextMenuDataMediaType::kFile)
+ASSERT_ENUMS_MATCH(WebEngineContextMenuData::MediaTypePlugin, blink::mojom::ContextMenuDataMediaType::kPlugin)
 
 ASSERT_ENUMS_MATCH(WebEngineContextMenuData::MediaNone, blink::WebContextMenuData::kMediaNone)
 ASSERT_ENUMS_MATCH(WebEngineContextMenuData::MediaInError, blink::WebContextMenuData::kMediaInError)
@@ -250,7 +249,7 @@ static Qt::DropActions toQtDropActions(blink::DragOperationsMask ops)
         result |= Qt::CopyAction;
     if (ops & blink::kDragOperationLink)
         result |= Qt::LinkAction;
-    if (ops & blink::kDragOperationMove || ops & blink::kDragOperationDelete)
+    if (ops & blink::kDragOperationMove)
         result |= Qt::MoveAction;
     return result;
 }
@@ -283,10 +282,10 @@ void WebContentsViewQt::StartDragging(const content::DropData &drop_data,
 #endif // QT_CONFIG(draganddrop)
 }
 
-void WebContentsViewQt::UpdateDragCursor(blink::DragOperation dragOperation)
+void WebContentsViewQt::UpdateDragCursor(ui::mojom::DragOperation dragOperation)
 {
 #if QT_CONFIG(draganddrop)
-    m_client->webContentsAdapter()->updateDragAction(dragOperation);
+    m_client->webContentsAdapter()->updateDragAction(static_cast<int>(dragOperation));
 #endif // QT_CONFIG(draganddrop)
 }
 

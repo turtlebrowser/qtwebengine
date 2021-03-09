@@ -212,10 +212,10 @@ bool PrintViewManagerBaseQt::PrintJobHasDocument(int cookie)
     return document && document->cookie() == cookie;
 }
 
-// IPC handlers
-void PrintViewManagerBaseQt::OnDidPrintDocument(content::RenderFrameHost* /*render_frame_host*/,
-                                                const printing::mojom::DidPrintDocumentParams &params,
-                                                std::unique_ptr<DelayedFrameDispatchHelper> helper)
+#if FIX_PRINTING
+IPC handlers
+void PrintViewManagerBaseQt::OnDidPrintDocument(printing::mojom::DidPrintDocumentParamsPtr params,
+                                                DidPrintDocumentCallback callback)
 {
     if (!PrintJobHasDocument(params.document_cookie))
         return;
@@ -236,9 +236,10 @@ void PrintViewManagerBaseQt::OnDidPrintDocument(content::RenderFrameHost* /*rend
 
     PrintDocument(data, params.page_size, params.content_area,
                   params.physical_offsets);
-    if (helper)
-        helper->SendCompleted();
+
+    std::move(callback).Run(false);
 }
+#endif // FIX_PRINTING
 
 void PrintViewManagerBaseQt::GetDefaultPrintSettings(GetDefaultPrintSettingsCallback callback)
 {
@@ -264,12 +265,14 @@ void PrintViewManagerBaseQt::PrintingFailed(int32_t cookie)
                 content::NotificationService::NoDetails());
 }
 
+#if FIX_PRINTING
 void PrintViewManagerBaseQt::OnScriptedPrint(content::RenderFrameHost *render_frame_host,
                                              const printing::mojom::ScriptedPrintParams &params,
                                              IPC::Message *reply_msg)
 {
     NOTREACHED() << "should be handled by printing::PrintingMessageFilter";
 }
+#endif // FIX_PRINTING
 
 void PrintViewManagerBaseQt::ShowInvalidPrinterSettingsError()
 {

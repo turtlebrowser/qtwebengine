@@ -53,6 +53,8 @@
 #include "third_party/blink/public/common/peerconnection/webrtc_ip_handling_policy.h"
 #include "third_party/blink/public/common/web_preferences/web_preferences.h"
 #include "third_party/blink/public/mojom/renderer_preferences.mojom.h"
+#include "third_party/blink/public/mojom/webpreferences/web_preferences.mojom-blink.h"
+#include "ui/base/pointer/pointer_device.h"
 #include "ui/base/ui_base_switches.h"
 #include "ui/events/event_switches.h"
 #include "ui/native_theme/native_theme.h"
@@ -353,7 +355,7 @@ void WebEngineSettings::applySettingsToWebPreferences(blink::web_pref::WebPrefer
     prefs->touch_event_feature_detection_enabled = isTouchEventsAPIEnabled();
 #if !QT_CONFIG(webengine_embedded_build)
     prefs->available_hover_types = ui::HOVER_TYPE_HOVER;
-    prefs->primary_hover_type = ui::HOVER_TYPE_HOVER;
+    prefs->primary_hover_type = blink::mojom::HoverType::kHoverNone;
 #endif
     if (prefs->viewport_enabled) {
         // We need to enable the viewport options together as it doesn't really work

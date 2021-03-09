@@ -493,7 +493,6 @@ void tst_Accessibility::roles_data()
     QTest::newRow("ax::mojom::Role::kSearchBox") << QString("<input type='search'></input>") << 1 << QAccessible::EditableText;
     QTest::newRow("ax::mojom::Role::kSection") << QString("<section></section>") << 0 << QAccessible::Section;
     QTest::newRow("ax::mojom::Role::kSlider") << QString("<input type='range'>") << 1 << QAccessible::Slider;
-    //QTest::newRow("ax::mojom::Role::kSliderThumb") << QString("<input type='range'>") << 1 << QAccessible::Slider; // TODO: blink/renderer/modules/accessibility/ax_slider.cc
     QTest::newRow("ax::mojom::Role::kSpinButton") << QString("<input type='number'></input>") << 1 << QAccessible::SpinBox;
     QTest::newRow("ax::mojom::Role::kSplitter") << QString("<hr>") << 0 << QAccessible::Splitter;
     QTest::newRow("ax::mojom::Role::kStaticText") << QString("a") << 1 << QAccessible::StaticText;
